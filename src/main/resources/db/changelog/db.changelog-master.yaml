@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 27032024_01
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              create extension if not exists "uuid-ossp";
+              create extension if not exists citext;

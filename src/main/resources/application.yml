@@ -1,0 +1,40 @@
+server:
+  port: 9000
+  servlet:
+    context-path: /api
+
+spring:
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/delivery_dev
+    username: odoo
+    password: odoo
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: true
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  liquibase:
+    default-schema: public
+
+delivery_app:
+  email:
+    host: mx48.hostgator.mx
+    port: 465
+    userName: no-reply@plataformasevoluta.com
+    password: LKsw$po1937J.#
+    bccEnabled: false
