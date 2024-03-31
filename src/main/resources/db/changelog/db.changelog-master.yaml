@@ -7,3 +7,78 @@ databaseChangeLog:
             sql: >-
               create extension if not exists "uuid-ossp";
               create extension if not exists citext;
+
+  -  changeSet:
+       id: 27032024_02
+       author: jdev
+       changes:
+         - createSequence:
+               cycle: false
+               dataType: INTEGER
+               startValue: 1
+               incrementBy: 1
+               minValue: 1
+               maxValue: 2147483647
+               schemaName: public
+               sequenceName: product_category_id_seq
+         -  createTable:
+              tableName: product_category
+              columns:
+                -  column:
+                     name: id
+                     type: INTEGER
+                     remarks:  ID Unique, PK
+                     defaultValueComputed: nextval('product_category_id_seq')
+                     constraints:
+                       nullable: false
+                       primaryKey: true
+                       primaryKeyName: pk_product_category_id
+                -  column:
+                     name: name
+                     type: VARCHAR
+                     remarks: Name
+                - column:
+                    name: complete_name
+                    type: VARCHAR
+                    remarks: Complete Name
+                - column:
+                    name: parent_path
+                    type: VARCHAR
+                    remarks: Parent path
+                - column:
+                    name: parent_id
+                    type: INTEGER
+                    remarks: Parent Category
+                - column:
+                    name: created_at
+                    type: TIMESTAMP WITHOUT TIME ZONE
+                    remarks: Created on
+                - column:
+                    name: updated_at
+                    type: TIMESTAMP WITHOUT TIME ZONE
+                    remarks: Last Updated on
+                - column:
+                    name: create_uid
+                    type: VARCHAR
+                    remarks: Created by
+                - column:
+                    name: write_uid
+                    type: VARCHAR
+                    remarks: Last Updated by
+         - createIndex:
+             clustered: false
+             columns:
+               - column:
+                   descending: false
+                   name: name
+             indexName: product_category__name_index
+             schemaName: public
+             tableName: product_category
+             unique: true
+         - addForeignKeyConstraint:
+             baseColumnNames: parent_id
+             baseTableName: product_category
+             constraintName: product_category_parent_id_fkey
+             referencedColumnNames: id
+             referencedTableName: product_category
+             validate: true

@@ -1,7 +1,7 @@
 server:
-  port: 9000
+  port: 9095
   servlet:
-    context-path: /api
+    context-path: /
 
 spring:
   main:
@@ -27,11 +27,39 @@ spring:
     properties:
       hibernate:
         jdbc:
-          time_zone: UTC
+          time_zone: America/Mexico_City
+
   liquibase:
     default-schema: public
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${keycloak.domain}/realms/${keycloak.realm}
+
+jwt:
+  auth:
+    converter:
+      resource-id: authenticationClientId
+
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: TRACE
+
+keycloak:
+  realm: spring-boot-code
+  domain: localhost:8180
+  adminClientId: admin-cli
+  adminClientSecret: Dtp73qr613ImdwVckoAd0uzz2PiLE6nW
+  client: authenticationClientId
+  urls:
+    auth: http://${keycloak.domain}
+
 delivery_app:
+  timezone: America/Mexico_City
   email:
     host: mx48.hostgator.mx
     port: 465
