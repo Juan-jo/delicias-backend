@@ -1,4 +1,4 @@
-package com.delivery.app.product.category.dtos;
+package com.delivery.app.product.category.dto;
 
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnUpdate;

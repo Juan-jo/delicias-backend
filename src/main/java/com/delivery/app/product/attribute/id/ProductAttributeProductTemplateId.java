@@ -1,7 +1,7 @@
 package com.delivery.app.product.attribute.id;
 
 import com.delivery.app.product.attribute.models.ProductAttribute;
-import com.delivery.app.product.template.model.ProductTemplate;
+import com.delivery.app.product.template.models.ProductTemplate;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;

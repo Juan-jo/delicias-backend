@@ -28,4 +28,8 @@ public class ProductAttribute extends AuditableEntity {
     @Column(name = "display_type")
     private String displayType;
 
+    public ProductAttribute(Integer id) {
+        this.id = id;
+    }
+
 }

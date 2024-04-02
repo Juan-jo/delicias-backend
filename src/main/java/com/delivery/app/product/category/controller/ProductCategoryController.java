@@ -2,7 +2,7 @@ package com.delivery.app.product.category.controller;
 
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnUpdate;
-import com.delivery.app.product.category.dtos.ProductCategoryRecordDTO;
+import com.delivery.app.product.category.dto.ProductCategoryRecordDTO;
 import com.delivery.app.product.category.service.ProductCategoryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

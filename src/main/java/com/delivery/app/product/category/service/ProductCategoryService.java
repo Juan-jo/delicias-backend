@@ -1,6 +1,6 @@
 package com.delivery.app.product.category.service;
 
-import com.delivery.app.product.category.dtos.ProductCategoryRecordDTO;
+import com.delivery.app.product.category.dto.ProductCategoryRecordDTO;
 import com.delivery.app.product.category.model.ProductCategory;
 import com.delivery.app.product.category.repository.ProductCategoryRepository;
 import lombok.AllArgsConstructor;

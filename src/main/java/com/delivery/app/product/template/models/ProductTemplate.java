@@ -1,11 +1,13 @@
-package com.delivery.app.product.template.model;
+package com.delivery.app.product.template.models;
 
 import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.product.attribute.models.ProductAttributeProductTemplateRel;
+import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.category.model.ProductCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,7 +29,7 @@ public class ProductTemplate extends AuditableEntity {
     )
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "categ_id", referencedColumnName = "id")
     private ProductCategory category;
 
@@ -49,7 +51,20 @@ public class ProductTemplate extends AuditableEntity {
 
     private Boolean active;
 
-
     @OneToMany(mappedBy = "id.productTemplate")
     private Set<ProductAttributeProductTemplateRel> attributeProductTemplateRels;
+
+    @ManyToMany
+    @JoinTable(
+            name = "product_template_product_attribute_value_rel",
+            joinColumns = @JoinColumn(name = "product_tmpl_id"),
+            foreignKey = @ForeignKey(name = "product_template_product_attribute_value_rel_product_tmpl_id_fkey"),
+            inverseJoinColumns = @JoinColumn(name = "product_attribute_value_id"),
+            inverseForeignKey = @ForeignKey(name = "product_template_product_attribute_value_rel_product_attribute_value_id_fkey")
+    )
+    private Set<ProductAttributeValue> attributeValues = new HashSet<>();
+
+    public ProductTemplate(Integer id) {
+        this.id = id;
+    }
 }
