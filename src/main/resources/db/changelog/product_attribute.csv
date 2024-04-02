@@ -1,0 +1,4 @@
+id,name,display_type
+1,Combinación,select
+2,Extra,select
+3,Especialidad,radio

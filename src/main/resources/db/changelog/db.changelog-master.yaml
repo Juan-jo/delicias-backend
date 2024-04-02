@@ -82,3 +82,336 @@ databaseChangeLog:
              referencedColumnNames: id
              referencedTableName: product_category
              validate: true
+
+  - changeSet:
+      id: 27032024_03
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: product_attribute_id_seq
+        - createTable:
+            tableName: product_attribute
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('product_attribute_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_product_attribute_id
+              - column:
+                  name: name
+                  type: VARCHAR
+                  remarks: Attribute
+              - column:
+                  name: display_type
+                  type: VARCHAR
+                  remarks: Display Type
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+  - changeSet:
+      id: 27032024_04
+      author: jdev
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: name
+                  name: name
+                  type: VARCHAR
+              - column:
+                  header: display_type
+                  name: display_type
+                  type: VARCHAR
+            encoding: UTF-8
+            file: /db/changelog/product_attribute.csv
+            schemaName: public
+            tableName: product_attribute
+
+  - changeSet:
+      id: 27032024_05
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: product_attribute_value_id_seq
+        - createTable:
+            tableName: product_attribute_value
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('product_attribute_value_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_product_attribute_value_id
+              - column:
+                  name: name
+                  type: VARCHAR
+                  remarks: Value
+              - column:
+                  name: attribute_id
+                  type: INTEGER
+                  remarks: Attribute
+              - column:
+                  name: default_extra_price
+                  type: FLOAT8
+                  remarks: Default Extra Price
+              - column:
+                  name: sequence
+                  type: INTEGER
+                  remarks: Sequence
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+        - addForeignKeyConstraint:
+            baseColumnNames: attribute_id
+            baseTableName: product_attribute_value
+            constraintName: product_attribute_value_attribute_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_attribute
+            validate: true
+
+  - changeSet:
+      id: 27032024_06
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: product_template_id_seq
+        - createTable:
+            tableName: product_template
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('product_template_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_product_template_id
+              - column:
+                  name: categ_id
+                  type: INTEGER
+                  remarks: Category
+              - column:
+                  name: restaurant_id
+                  type: INTEGER
+                  remarks: Restaurant
+              - column:
+                  name: name
+                  type: VARCHAR
+                  remarks: Name
+              - column:
+                  name: description
+                  type: TEXT
+                  remarks: Description
+              - column:
+                  name: has_configurable_attributes
+                  type: BOOL
+                  remarks: Is a configurable product
+              - column:
+                  name: list_price
+                  type: FLOAT8
+                  remarks: Sales Price
+              - column:
+                  name: sales_ok
+                  type: BOOL
+                  remarks: Can be Sold
+              - column:
+                  name: active
+                  type: BOOL
+                  remarks: Active
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+        - addForeignKeyConstraint:
+            baseColumnNames: categ_id
+            baseTableName: product_template
+            constraintName: product_template_categ_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_category
+            validate: true
+
+  - changeSet:
+      id: 27032024_07
+      author: jdev
+      changes:
+        - createTable:
+            tableName: product_attribute_product_template_rel
+            columns:
+              - column:
+                  name: product_attribute_id
+                  type: INTEGER
+              - column:
+                  name: product_template_id
+                  type: INTEGER
+        - addForeignKeyConstraint:
+            baseColumnNames: product_attribute_id
+            baseTableName: product_attribute_product_template_rel
+            constraintName: product_attribute_product_template_rel_product_attribute_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_attribute
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: product_template_id
+            baseTableName: product_attribute_product_template_rel
+            constraintName: product_attribute_product_template_rel_product_template_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_template
+            validate: true
+        - addPrimaryKey:
+            clustered: true
+            columnNames: product_attribute_id, product_template_id
+            constraintName: pk_product_attribute_product_template_rel
+            schemaName: public
+            tableName: product_attribute_product_template_rel
+            validate: true
+
+  - changeSet:
+      id: 27032024_08
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: product_template_product_attribute_value_rel_id_seq
+        - createTable:
+            tableName: product_template_product_attribute_value_rel
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('product_template_product_attribute_value_rel_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_product_template_product_attribute_value_rel_id
+              - column:
+                  name: product_tmpl_id
+                  type: INTEGER
+                  remarks: Product Template
+              - column:
+                  name: product_attribute_value_id
+                  type: INTEGER
+                  remarks: Attribute Value
+              - column:
+                  name: attribute_id
+                  type: INTEGER
+                  remarks: Attribute
+              - column:
+                  name: active
+                  type: BOOL
+                  remarks: Active
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+              - addForeignKeyConstraint:
+                  baseColumnNames: product_tmpl_id
+                  baseTableName: product_template_product_attribute_value_rel
+                  constraintName: product_template_product_attribute_value_rel_product_tmpl_id_fkey
+                  referencedColumnNames: id
+                  referencedTableName: product_template
+              - addForeignKeyConstraint:
+                  baseColumnNames: product_attribute_value_id
+                  baseTableName: product_template_product_attribute_value_rel
+                  constraintName: product_template_product_attribute_value_rel_product_attribute_value_id_fkey
+                  referencedColumnNames: id
+                  referencedTableName: product_attribute_value
+              - addForeignKeyConstraint:
+                  baseColumnNames: attribute_id
+                  baseTableName: product_template_product_attribute_value_rel
+                  constraintName: product_template_product_attribute_value_rel_attribute_id_fkey
+                  referencedColumnNames: id
+                  referencedTableName: product_attribute
