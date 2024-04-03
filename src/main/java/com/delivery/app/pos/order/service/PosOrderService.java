@@ -75,8 +75,6 @@ public class PosOrderService {
         ).map(i -> FilterOrdersRestaurantResponseDTO.builder()
                 .id(i.getId())
                 .status(i.getStatus())
-                .orderDate(i.getDateOrder())
-                .createdAt(i.getCreatedAt())
                 .build());
     }
 }
