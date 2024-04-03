@@ -1,5 +1,6 @@
 package com.delivery.app.product.category.service;
 
+import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.product.category.dto.ProductCategoryRecordDTO;
 import com.delivery.app.product.category.model.ProductCategory;
 import com.delivery.app.product.category.repository.ProductCategoryRepository;
@@ -28,7 +29,7 @@ public class ProductCategoryService {
         Optional.ofNullable(categoryRecord.parentId()).ifPresent(parentId -> {
 
             ProductCategory parent = productCategoryRepository.findById(parentId)
-                    .orElseThrow();
+                    .orElseThrow(() -> new ResourceNotFoundException("categ", "parentId", parentId));
 
             productCategory.completeName(String.format("%s / %s", parent.getCompleteName(), categoryRecord.name()));
             productCategory.parent(parent);
@@ -49,14 +50,14 @@ public class ProductCategoryService {
     public ProductCategoryRecordDTO update(ProductCategoryRecordDTO categoryRecord) {
 
         ProductCategory category = productCategoryRepository.findById(categoryRecord.id())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("categ", "id", categoryRecord.id()));
 
         category.setName(categoryRecord.name());
 
         Optional.ofNullable(categoryRecord.parentId()).ifPresentOrElse(parentId -> {
 
             ProductCategory parent = productCategoryRepository.findById(parentId)
-                    .orElseThrow();
+                    .orElseThrow(() -> new ResourceNotFoundException("categ", "parentId", parentId));
 
             category.setCompleteName(String.format("%s / %s", parent.getCompleteName(), categoryRecord.name()));
             category.setParent(parent);
@@ -77,9 +78,9 @@ public class ProductCategoryService {
 
     public ProductCategoryRecordDTO findById(Integer id) {
 
-        return  productCategoryRepository.findById(id)
+        return productCategoryRepository.findById(id)
                 .map(this::modelToProductCategoryDTO)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("categ", "id", id));
     }
 
     private String calculateParentPath(ProductCategory parent, Integer newCategId) {
