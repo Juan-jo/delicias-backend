@@ -415,3 +415,105 @@ databaseChangeLog:
                   constraintName: product_template_product_attribute_value_rel_attribute_id_fkey
                   referencedColumnNames: id
                   referencedTableName: product_attribute
+
+  - changeSet:
+      id: 27032024_09
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: pos_order_id_seq
+        - createTable:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('pos_order_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_pos_order_id
+              - column:
+                  name: status
+                  type: VARCHAR
+                  remarks: Status
+              - column:
+                  name: notes
+                  type: VARCHAR
+                  remarks: Customer notes
+              - column:
+                  name: amount_total
+                  type: FLOAT8
+                  remarks: Total
+              - column:
+                  name: restaurant_id
+                  type: INTEGER
+                  remarks: Restaurant
+              - column:
+                  name: user_uid
+                  type: UUID
+                  remarks: Keycloak user ID
+              - column:
+                  name: delivery_uid
+                  type: UUID
+                  remarks: Keycloak delivery user ID
+              - column:
+                  name: date_order
+                  type: DATE
+                  remarks: Date
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+        - createIndex:
+            clustered: false
+            columns:
+              - column:
+                  descending: false
+                  name: user_uid
+            indexName: pos_order__user_uid_index
+            schemaName: public
+            tableName: pos_order
+            unique: false
+        - createIndex:
+            clustered: false
+            columns:
+              - column:
+                  descending: false
+                  name: restaurant_id
+            indexName: pos_order__restaurant_id_index
+            schemaName: public
+            tableName: pos_order
+            unique: false
+        - createIndex:
+            clustered: false
+            columns:
+              - column:
+                  descending: false
+                  name: date_order
+            indexName: pos_order__date_order_index
+            schemaName: public
+            tableName: pos_order
+            unique: false
