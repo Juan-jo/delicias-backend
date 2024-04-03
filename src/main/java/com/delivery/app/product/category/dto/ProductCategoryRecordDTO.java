@@ -9,7 +9,6 @@ import lombok.Builder;
 
 
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProductCategoryRecordDTO(
         @NotNull(message = "id is mandatory", groups = { OnUpdate.class})
         Integer id,
