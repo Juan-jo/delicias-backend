@@ -1,6 +1,21 @@
 package com.delivery.app.mobile.dtos;
 
-import com.delivery.app.configs.dto.BaseFilterDTO;
+import com.delivery.app.configs.validation.common.OnFilter;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-public class ProductFilterRequestDTO extends BaseFilterDTO {
+public record ProductFilterRequestDTO(
+        @NotNull(message = "The page number parameter is mandatory.", groups = { OnFilter.class })
+        Integer page,
+
+        @NotNull(message = "The elements number parameter is mandatory.", groups = { OnFilter.class })
+        Integer size
+) {
+
+
+    public Pageable pageable() {
+        return PageRequest.of(page, size);
+    }
+
 }
