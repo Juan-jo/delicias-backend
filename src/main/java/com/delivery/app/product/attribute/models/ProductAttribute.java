@@ -4,6 +4,8 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "product_attribute")
 @Getter
@@ -27,6 +29,8 @@ public class ProductAttribute extends AuditableEntity {
 
     @Column(name = "display_type")
     private String displayType;
+
+    private Integer sequence;
 
     public ProductAttribute(Integer id) {
         this.id = id;

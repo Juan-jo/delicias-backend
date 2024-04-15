@@ -1,4 +1,4 @@
-package com.delivery.app.pos.status;
+package com.delivery.app.pos.enums;
 
 public enum OrderStatus {
     ORDERED,

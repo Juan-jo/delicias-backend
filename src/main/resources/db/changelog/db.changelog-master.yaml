@@ -517,3 +517,144 @@ databaseChangeLog:
             schemaName: public
             tableName: pos_order
             unique: false
+
+  - changeSet:
+      id: 27032024_10
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: pos_order_line_id_seq
+        - createTable:
+            tableName: pos_order_line
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('pos_order_line_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_pos_order_line_id
+              - column:
+                  name: order_id
+                  type: INTEGER
+                  remarks: Order Ref
+              - column:
+                  name: product_tmpl_id
+                  type: INTEGER
+                  remarks: Product template
+              - column:
+                  name: qty
+                  type: INTEGER
+                  remarks: Quantity
+              - column:
+                  name: price_unit
+                  type: FLOAT8
+                  remarks: Unit Price
+              - column:
+                  name: price_total
+                  type: FLOAT8
+                  remarks: Total
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: pos_order_line
+            constraintName: pos_order_line_order_id_fkey
+            referencedColumnNames: id
+            referencedTableName: pos_order
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: product_tmpl_id
+            baseTableName: pos_order_line
+            constraintName: pos_order_line_product_tmpl_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_template
+            validate: true
+
+  - changeSet:
+      id: 27032024_11
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: pos_order_line_product_attribute_value_rel_id_seq
+        - createTable:
+            tableName: pos_order_line_product_attribute_value_rel
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('pos_order_line_product_attribute_value_rel_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_pos_order_line_product_attribute_value_rel_id
+              - column:
+                  name: order_line_id
+                  type: INTEGER
+                  remarks: Order Line Ref
+              - column:
+                  name: product_attribute_value_id
+                  type: INTEGER
+                  remarks: Attribute Value
+              - column:
+                  name: default_extra_price
+                  type: FLOAT8
+                  remarks: Extra price
+        - addForeignKeyConstraint:
+            baseColumnNames: order_line_id
+            baseTableName: pos_order_line_product_attribute_value_rel
+            constraintName: pos_order_line_product_attribute_value_rel_order_line_id_fkey
+            referencedColumnNames: id
+            referencedTableName: pos_order_line
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: product_attribute_value_id
+            baseTableName: pos_order_line_product_attribute_value_rel
+            constraintName: pos_order_line_product_attribute_value_rel_product_attribute_value_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_attribute_value
+            validate: true
+
+  - changeSet:
+      id: 27032024_12
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: product_attribute
+            columns:
+              - column:
+                  name: sequence
+                  type: INTEGER

@@ -54,6 +54,7 @@ public class ProductTemplate extends AuditableEntity {
     @OneToMany(mappedBy = "id.productTemplate")
     private Set<ProductAttributeProductTemplateRel> attributeProductTemplateRels;
 
+    @OrderBy("sequence asc")
     @ManyToMany
     @JoinTable(
             name = "product_template_product_attribute_value_rel",

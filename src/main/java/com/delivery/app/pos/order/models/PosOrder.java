@@ -1,12 +1,12 @@
 package com.delivery.app.pos.order.models;
 
 import com.delivery.app.configs.auditable.model.AuditableEntity;
-import com.delivery.app.pos.status.OrderStatus;
+import com.delivery.app.pos.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -47,7 +47,7 @@ public class PosOrder extends AuditableEntity {
     @Column(name = "date_order")
     private LocalDate dateOrder;
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    @OneToMany(mappedBy = "order")
+    private Set<PosOrderLine> lines;
+
 }

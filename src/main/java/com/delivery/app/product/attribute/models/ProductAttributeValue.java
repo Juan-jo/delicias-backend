@@ -34,4 +34,7 @@ public class ProductAttributeValue extends AuditableEntity {
 
     private Integer sequence;
 
+    public ProductAttributeValue(Integer id) {
+        this.id = id;
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
 @Configuration
@@ -26,10 +27,9 @@ public class WebSecurityConfig {
 
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        //.requestMatchers(HttpMethod.POST, "/product/category").anonymous()
-                        //.requestMatchers(HttpMethod.GET, "/test/admin", "/test/admin/**").hasRole(ADMIN)
-                        //.requestMatchers(HttpMethod.GET, "/product/category/**").hasAnyRole(GENERAL)
-                        //.requestMatchers(HttpMethod.GET, "/test/user").authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/mobile/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/mobile/product", HttpMethod.POST.name())).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -39,36 +39,6 @@ public class WebSecurityConfig {
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-
-        return (web) -> {
-            web.ignoring().requestMatchers(
-                    HttpMethod.POST,
-                    "/public/**",
-                    "/users"
-            );
-            web.ignoring().requestMatchers(
-                    HttpMethod.GET,
-                    "/public/**"
-            );
-            web.ignoring().requestMatchers(
-                    HttpMethod.DELETE,
-                    "/public/**"
-            );
-            web.ignoring().requestMatchers(
-                    HttpMethod.PUT,
-                    "/public/**"
-            );
-
-            web.ignoring().requestMatchers(
-                    HttpMethod.PUT,
-                    "/public/**"
-            );
-
-        };
     }
 
 }

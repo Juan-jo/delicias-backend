@@ -1,8 +1,8 @@
-package com.delivery.app.pos.order.repository;
+package com.delivery.app.pos.order.repositories;
 
 
 import com.delivery.app.pos.order.models.PosOrder;
-import com.delivery.app.pos.status.OrderStatus;
+import com.delivery.app.pos.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
