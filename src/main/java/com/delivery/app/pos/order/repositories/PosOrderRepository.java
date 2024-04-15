@@ -12,10 +12,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PosOrderRepository extends JpaRepository<PosOrder, Integer> {
 
+    String querySearchFilter = """
+                SELECT      o
+                    FROM    PosOrder o
+                    WHERE   :status IS NULL OR o.status = :status
+            """;
 
-    @Query("select o"
-            + " from PosOrder o"
-            + " where :status is null or o.status = :status")
+    @Query(querySearchFilter)
     Page<PosOrder> filterRestaurant(
             OrderStatus status,
             Pageable pageable

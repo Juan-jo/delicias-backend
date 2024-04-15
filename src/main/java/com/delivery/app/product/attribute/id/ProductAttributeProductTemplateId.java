@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Embeddable
 @Getter
 @Setter
@@ -25,4 +27,17 @@ public class ProductAttributeProductTemplateId {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_template_id", referencedColumnName = "id")
     private ProductTemplate productTemplate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductAttributeProductTemplateId that = (ProductAttributeProductTemplateId) o;
+        return Objects.equals(attribute, that.attribute) && Objects.equals(productTemplate, that.productTemplate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(attribute, productTemplate);
+    }
 }
