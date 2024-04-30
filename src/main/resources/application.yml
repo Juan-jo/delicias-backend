@@ -15,8 +15,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/delivery_dev
-    username: odoo
-    password: odoo
+    username: postgres
+    password: 123456
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -60,9 +60,3 @@ keycloak:
 
 delivery_app:
   timezone: America/Mexico_City
-  email:
-    host: mx48.hostgator.mx
-    port: 465
-    userName: no-reply@plataformasevoluta.com
-    password: LKsw$po1937J.#
-    bccEnabled: false
