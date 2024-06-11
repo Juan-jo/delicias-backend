@@ -4,6 +4,8 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "product_category")
 @Getter
@@ -36,5 +38,12 @@ public class ProductCategory extends AuditableEntity {
 
     public ProductCategory(Integer id) {
         this.id = id;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return this.updatedAt;
+    }
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
     }
 }

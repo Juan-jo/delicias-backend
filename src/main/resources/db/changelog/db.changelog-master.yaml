@@ -658,3 +658,59 @@ databaseChangeLog:
               - column:
                   name: sequence
                   type: INTEGER
+
+  - changeSet:
+      id: 27032024_13
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: restaurant_template_id_seq
+        - createTable:
+            tableName: restaurant_template
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('restaurant_template_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_restaurant_template_id
+              - column:
+                  name: name
+                  type: VARCHAR
+                  remarks: Restaurant name
+              - column:
+                  name: description
+                  type: VARCHAR
+                  remarks: Restaurant description
+              - column:
+                  name: phone
+                  type: VARCHAR(15)
+                  remarks: phone
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by

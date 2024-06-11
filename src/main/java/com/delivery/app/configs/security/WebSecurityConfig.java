@@ -28,8 +28,9 @@ public class WebSecurityConfig {
         return httpSecurity
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/mobile/**")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/mobile/product", HttpMethod.POST.name())).permitAll()
+                        //.requestMatchers("/oauth2/**", "/login/**").permitAll()
+                        //.requestMatchers(new AntPathRequestMatcher("/api/mobile/**")).permitAll()
+                        //.requestMatchers(new AntPathRequestMatcher("/api/mobile/product", HttpMethod.POST.name())).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -1,6 +1,6 @@
 package com.delivery.app.configs.auditable.model;
 
-import com.delivery.app.security.KeycloakUserService;
+import com.delivery.app.security.services.KeycloakUserService;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;

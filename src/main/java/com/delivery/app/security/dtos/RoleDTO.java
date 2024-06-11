@@ -1,4 +1,9 @@
 package com.delivery.app.security.dtos;
 
-public record RoleDTO() {
-}
+import lombok.Builder;
+
+@Builder
+public record RoleDTO(
+        String roleName,
+        String description
+) { }

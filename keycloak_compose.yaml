@@ -1,5 +1,7 @@
 version: "3.9"
 
+# sudo docker compose -f keycloak_compose.yaml up -d
+
 services:
 
   keycloak_server:

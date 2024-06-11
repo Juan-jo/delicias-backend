@@ -1,4 +1,10 @@
 package com.delivery.app.product.category.dto;
 
-public class ProductCategoryParentOptionDTO {
+import lombok.Builder;
+
+@Builder
+public record ProductCategoryParentOptionDTO(
+        Integer id,
+        String completeName
+) {
 }

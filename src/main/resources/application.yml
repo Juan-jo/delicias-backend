@@ -16,7 +16,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/delivery_dev
     username: postgres
-    password: 123456
+    password: password
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -37,11 +37,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://${keycloak.domain}/realms/${keycloak.realm}
+  jackson:
+    date-format: dd/MM/yyyy HH:mm:ss
 
 jwt:
   auth:
     converter:
-      resource-id: authenticationClientId
+      resource-id: app-auth-id
 
 #logging:
 #  level:
@@ -50,11 +52,12 @@ jwt:
 #        security: TRACE
 
 keycloak:
-  realm: spring-boot-code
+  use-resource-role-mappings: true
+  realm: delivery-app
   domain: localhost:8180
   adminClientId: admin-cli
-  adminClientSecret: Dtp73qr613ImdwVckoAd0uzz2PiLE6nW
-  client: authenticationClientId
+  adminClientSecret: 1jXawKyu2BDDqNu0FInFY3sZ2Q82AHEw
+  client: app-auth-id
   urls:
     auth: http://${keycloak.domain}
 
