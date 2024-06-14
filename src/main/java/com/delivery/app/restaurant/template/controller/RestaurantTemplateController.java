@@ -7,6 +7,7 @@ import com.delivery.app.configs.validation.common.OnUpdate;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateReqFilterRows;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateRow;
+import com.delivery.app.restaurant.template.dto.RestaurantTmplOptionDTO;
 import com.delivery.app.restaurant.template.service.RestaurantTemplateService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -55,6 +58,16 @@ public class RestaurantTemplateController {
         );
     }
 
+    @DeleteMapping("/{tmplId}")
+    public ResponseEntity<?> deleteById(
+            @NotNull @PathVariable Integer tmplId
+    ) {
+
+        restaurantTemplateService.deleteById(tmplId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/filter")
     @Validated(OnFilter.class)
     public ResponseEntity<Page<RestaurantTemplateRow>> filter(
@@ -64,6 +77,16 @@ public class RestaurantTemplateController {
         return ResponseEntity.ok(
                 restaurantTemplateService.findByFilter(reqFilterRows)
         );
+    }
+
+
+    @GetMapping("/options")
+    public ResponseEntity<List<RestaurantTmplOptionDTO>> tmplList() {
+
+        return ResponseEntity.ok(
+                restaurantTemplateService.tmplOptionDTOList()
+        );
+
     }
 
 }

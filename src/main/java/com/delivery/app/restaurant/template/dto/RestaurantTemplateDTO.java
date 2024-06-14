@@ -17,9 +17,9 @@ public record RestaurantTemplateDTO(
         @NotNull(message = "Name is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String name,
 
-        @Size(max = 500, min = 1, message = "Not valid name. Must have minimum 1 chars or maximum 500 chars.", groups = { OnCreate.class, OnUpdate.class})
+        @Size(max = 500, message = "Not valid name. Must have minimum 1 chars or maximum 500 chars.", groups = { OnCreate.class, OnUpdate.class})
         String description,
 
-        @Size(max = 15, min = 1, message = "Not valid phone. Must have minimum 1 chars or maximum 500 chars.", groups = { OnCreate.class, OnUpdate.class})
+        @Size(max = 15, message = "Not valid phone. Must have minimum 1 chars or maximum 500 chars.", groups = { OnCreate.class, OnUpdate.class})
         String phone
 ) { }
