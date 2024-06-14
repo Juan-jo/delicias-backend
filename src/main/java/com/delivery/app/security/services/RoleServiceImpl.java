@@ -39,6 +39,12 @@ public class RoleServiceImpl implements  RoleService {
                 throw new IllegalArgumentException("Role representation not found for role: " + roleName);
             }
 
+            userResource.roles().realmLevel().remove(
+                    getRolesResource().list()
+                            .stream()
+                            .filter(r -> r.getName().startsWith("ROLE_"))
+                            .toList()
+            );
             userResource.roles().realmLevel().add(Collections.singletonList(roleRepresentation));
             System.out.println("Role " + roleName + " assigned to user " + userId + " successfully.");
         } catch (Exception e) {
