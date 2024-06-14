@@ -1,9 +1,6 @@
 package com.delivery.app.security.services;
 
-import com.delivery.app.security.dtos.RoleDTO;
-import com.delivery.app.security.dtos.UserRegistrationRecordDTO;
-import com.delivery.app.security.dtos.UserReqFilterRowsDTO;
-import com.delivery.app.security.dtos.UserRowDTO;
+import com.delivery.app.security.dtos.*;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
@@ -11,13 +8,15 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface KeycloakUserService {
-    UserRegistrationRecordDTO createUser(UserRegistrationRecordDTO userRegistrationRecordDTO);
+    UserDTO createUser(UserDTO userDTO);
+    UserDTO updateUser(UserDTO userDTO);
     UserRepresentation getUserById(String userId);
     void deleteUserById(String userId);
     void emailVerification(String userId);
     UserResource getUserResource(String userId);
-    void updatePassword(String userId);
+    void updatePassword(UserChangePasswordDTO userChangePasswordDTO);
 
+    UserDTO findById(String id);
     List<UserRowDTO> searchList(UserReqFilterRowsDTO reqFilterRowsDTO);
     Page<UserRowDTO> search(UserReqFilterRowsDTO reqFilterRowsDTO, List<RoleDTO> roles);
 }

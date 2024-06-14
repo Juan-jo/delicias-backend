@@ -1,10 +1,9 @@
 package com.delivery.app.security.services;
 
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.security.dtos.RoleDTO;
-import com.delivery.app.security.dtos.UserRegistrationRecordDTO;
-import com.delivery.app.security.dtos.UserReqFilterRowsDTO;
-import com.delivery.app.security.dtos.UserRowDTO;
+import com.delivery.app.security.dtos.*;
+import com.delivery.app.security.exceptions.EmailAlreadyExistsException;
+import com.delivery.app.security.exceptions.UsernameAlreadyExistsDTO;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.keycloak.admin.client.Keycloak;
@@ -12,6 +11,7 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 @Service
 public class KeycloakUserServiceImpl implements KeycloakUserService {
 
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final String ATTR_STORE = "store";
+    private static final String ROLE_STORE = "ROLE_STORE";
+
     @Value("${keycloak.realm}")
     private String realm;
     private final Keycloak keycloak;
@@ -38,9 +42,9 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         this.keycloak = keycloak;
     }
     @Override
-    public UserRegistrationRecordDTO createUser(UserRegistrationRecordDTO userRegistrationRecordDTO) {
+    public UserDTO createUser(UserDTO userDTO) {
 
-        UserRepresentation user = getUser(userRegistrationRecordDTO);
+        UserRepresentation user = getUser(userDTO);
 
         UsersResource usersResource = getUsersResource();
 
@@ -48,7 +52,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
 
         if(Objects.equals(201,response.getStatus())){
 
-            List<UserRepresentation> representationList = usersResource.searchByUsername(userRegistrationRecordDTO.username(), true);
+            List<UserRepresentation> representationList = usersResource.searchByUsername(userDTO.username(), true);
             if(!CollectionUtils.isEmpty(representationList)){
                 UserRepresentation userRepresentation1 = representationList.stream()
                         .filter(userRepresentation -> Objects.equals(false, userRepresentation.isEmailVerified()))
@@ -56,32 +60,74 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
                 assert userRepresentation1 != null;
 
                 emailVerification(userRepresentation1.getId());
-                return UserRegistrationRecordDTO.builder()
+                return UserDTO.builder()
                         .id(userRepresentation1.getId())
-                        .roleName(userRegistrationRecordDTO.roleName())
+                        .roleName(userDTO.roleName())
                         .build();
             }
 
-            return userRegistrationRecordDTO;
+            return userDTO;
+        }
+        else {
+
+            List<UserRepresentation> resultUsername = usersResource.searchByUsername(userDTO.username(), true);
+
+            if(!resultUsername.isEmpty()) {
+                throw new UsernameAlreadyExistsDTO(userDTO.username());
+            }
+
+            List<UserRepresentation> resultEmail = usersResource.searchByEmail(userDTO.email(), true);
+            if(!resultEmail.isEmpty()) {
+                throw  new EmailAlreadyExistsException(userDTO.email());
+            }
+
         }
 
         return null;
     }
 
-    private static UserRepresentation getUser(UserRegistrationRecordDTO userRegistrationRecordDTO) {
-        UserRepresentation user=new UserRepresentation();
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+
+        UserRepresentation userRepresentation = getUserById(userDTO.id());
+        userRepresentation.setEmail(userDTO.email());
+        userRepresentation.setFirstName(userDTO.firstName());
+        userRepresentation.setLastName(userDTO.lastName());
+
+        if(userDTO.roleName().equals(ROLE_STORE)) {
+
+            Optional.ofNullable(userDTO.restaurantId()).ifPresentOrElse(storeId -> {
+
+                userRepresentation.singleAttribute(ATTR_STORE, String.valueOf(userDTO.restaurantId()));
+
+            }, () -> {
+                throw new ResourceNotFoundException("isnotfound", "", "");
+            });
+        }
+        else {
+            userRepresentation.singleAttribute(ATTR_STORE, null);
+        }
+
+        getUsersResource().get(userDTO.id()).update(userRepresentation);
+
+        return userDTO;
+    }
+
+
+    private static UserRepresentation getUser(UserDTO userDTO) {
+        UserRepresentation user = new UserRepresentation();
         user.setEnabled(true);
-        user.setUsername(userRegistrationRecordDTO.username());
-        user.setEmail(userRegistrationRecordDTO.email());
-        user.setFirstName(userRegistrationRecordDTO.firstName());
-        user.setLastName(userRegistrationRecordDTO.lastName());
+        user.setUsername(userDTO.username());
+        user.setEmail(userDTO.email());
+        user.setFirstName(userDTO.firstName());
+        user.setLastName(userDTO.lastName());
         user.setEmailVerified(false);
 
-        if(userRegistrationRecordDTO.roleName().equals("ROLE_STORE")) {
+        if(userDTO.roleName().equals(ROLE_STORE)) {
 
-            Optional.ofNullable(userRegistrationRecordDTO.restaurantId()).ifPresentOrElse(storeId -> {
+            Optional.ofNullable(userDTO.restaurantId()).ifPresentOrElse(storeId -> {
 
-                user.singleAttribute("store", String.valueOf(userRegistrationRecordDTO.restaurantId()));
+                user.singleAttribute(ATTR_STORE, String.valueOf(userDTO.restaurantId()));
 
             }, () -> {
                 throw new ResourceNotFoundException("isnotfound", "", "");
@@ -89,7 +135,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         }
 
         CredentialRepresentation credentialRepresentation=new CredentialRepresentation();
-        credentialRepresentation.setValue(userRegistrationRecordDTO.password());
+        credentialRepresentation.setValue(userDTO.password());
         credentialRepresentation.setTemporary(false);
         credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
 
@@ -108,7 +154,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     @Override
     public void deleteUserById(String userId) {
 
-
+        getUsersResource().get(userId).remove();
     }
 
     @Override
@@ -122,8 +168,52 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     }
 
     @Override
-    public void updatePassword(String userId) {
+    public void updatePassword(UserChangePasswordDTO userChangePasswordDTO) {
 
+        UserResource userResource = getUserResource(userChangePasswordDTO.id());
+
+        CredentialRepresentation newCredential = new CredentialRepresentation();
+        newCredential.setTemporary(false);
+        newCredential.setType(CredentialRepresentation.PASSWORD);
+        newCredential.setValue(userChangePasswordDTO.password());
+
+        userResource.resetPassword(newCredential);
+    }
+
+    @Override
+    public UserDTO findById(String id) {
+
+        UserResource userResource = getUserResource(id);
+        MappingsRepresentation roles = userResource.roles().getAll();
+        UserRepresentation user =  userResource.toRepresentation();
+
+        String userRole = roles.getRealmMappings()
+                .stream()
+                .map(RoleRepresentation::getName)
+                .filter(name -> name.startsWith(ROLE_PREFIX))
+                .collect(Collectors.joining());
+
+        return UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .roleName(userRole)
+                .restaurantId(Optional.ofNullable(user.getAttributes())
+                        .map(r -> {
+
+                            if(r.containsKey(ATTR_STORE)) {
+
+                                String firstAttr = r.get(ATTR_STORE).get(0);
+
+                                return Integer.valueOf(firstAttr);
+                            }
+
+                            return null;
+                        })
+                        .orElse(null))
+                .build();
     }
 
     @Override
@@ -206,12 +296,5 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     private UsersResource getUsersResource() {
         RealmResource realm1 = keycloak.realm(realm);
         return realm1.users();
-    }
-
-    private List<UserRepresentation> filter(String search) {
-
-        RealmResource realm1 = keycloak.realm(realm);
-        return realm1.users().search(search);
-
     }
 }

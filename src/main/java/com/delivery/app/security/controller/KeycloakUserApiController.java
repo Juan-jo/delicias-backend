@@ -2,13 +2,16 @@ package com.delivery.app.security.controller;
 
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnFilter;
+import com.delivery.app.configs.validation.common.OnUpdate;
 import com.delivery.app.security.dtos.*;
 import com.delivery.app.security.services.KeycloakUserService;
 import com.delivery.app.security.services.RoleService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +30,49 @@ public class KeycloakUserApiController {
     @PostMapping
     @Validated(OnCreate.class)
     public UserRepresentation createUser(
-            @Valid @RequestBody UserRegistrationRecordDTO userRegistrationRecordDTO) {
+            @Valid @RequestBody UserDTO userDTO) {
 
-        UserRegistrationRecordDTO userCreate = keycloakUserService.createUser(userRegistrationRecordDTO);
+        UserDTO userCreate = keycloakUserService.createUser(userDTO);
 
         roleService.assignRole(userCreate.id(), userCreate.roleName());
 
         return keycloakUserService.getUserById(userCreate.id());
     }
+
+    @PutMapping
+    @Validated(OnUpdate.class)
+    public UserRepresentation updateUser(
+            @Valid @RequestBody UserDTO userDTO) {
+
+        UserDTO userCreate = keycloakUserService.updateUser(userDTO);
+
+        roleService.assignRole(userCreate.id(), userCreate.roleName());
+
+        return keycloakUserService.getUserById(userCreate.id());
+    }
+
+    @PutMapping("/password")
+    @Validated(OnUpdate.class)
+    public ResponseEntity<?>  updatePassword(
+            @Valid @RequestBody UserChangePasswordDTO changePasswordDTO) {
+
+        keycloakUserService.updatePassword(changePasswordDTO);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{userId}")
+    public UserDTO findById(@NotNull @PathVariable String userId) {
+
+        return keycloakUserService.findById(userId);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteUser(@NotNull @PathVariable String userId) {
+        keycloakUserService.deleteUserById(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/search")
     @Validated(OnFilter.class)
