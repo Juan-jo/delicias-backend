@@ -4,6 +4,7 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.product.attribute.models.ProductAttributeProductTemplateRel;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.category.model.ProductCategory;
+import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,8 +34,9 @@ public class ProductTemplate extends AuditableEntity {
     @JoinColumn(name = "categ_id", referencedColumnName = "id")
     private ProductCategory category;
 
-    // TODO: Add restaurant relation
-    private Integer restaurantId;
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+    private RestaurantTemplate restaurantTmpl;
 
     private String name;
 

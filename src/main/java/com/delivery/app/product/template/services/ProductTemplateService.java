@@ -28,7 +28,7 @@ public class ProductTemplateService {
                 .id(template.getId())
                 .name(template.getName())
                 .description(template.getDescription())
-                .restaurantId(template.getRestaurantId())
+                .restaurantId(template.getRestaurantTmpl().getId())
                 .listPrice(template.getListPrice())
                 .categId(template.getCategory().getId())
                 .salesOk(template.getSalesOK())

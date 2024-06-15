@@ -61,7 +61,7 @@ public class MobileProductService {
                 .picture("https://coffee.alexflipnote.dev/random")
                 .rate(random.nextInt(5 - 1 + 1) + 1)
                 .restaurant(ProductTemplateDetailDTO.Restaurant.builder()
-                        .name("Restaurate name")
+                        .name(productTemplate.getRestaurantTmpl().getName())
                         .picture("https://coffee.alexflipnote.dev/random")
                         .build())
                 .attributes(

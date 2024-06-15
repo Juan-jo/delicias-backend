@@ -714,3 +714,15 @@ databaseChangeLog:
                   name: write_uid
                   type: VARCHAR
                   remarks: Last Updated by
+
+  -  changeSet:
+       id:  27032024_14
+       author: jdev
+       changes:
+         -  addForeignKeyConstraint:
+              baseColumnNames: restaurant_id
+              baseTableName: product_template
+              constraintName: product_template_restaurant_template_id_fkey
+              referencedColumnNames: id
+              referencedTableName: restaurant_template
+              validate: true
