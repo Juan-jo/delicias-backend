@@ -8,6 +8,7 @@ import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,5 +70,12 @@ public class ProductTemplate extends AuditableEntity {
 
     public ProductTemplate(Integer id) {
         this.id = id;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return this.updatedAt;
+    }
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
     }
 }
