@@ -4,6 +4,7 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.product.attribute.models.ProductAttributeProductTemplateRel;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.category.model.ProductCategory;
+import com.delivery.app.product.template.dtos.ProductTemplateRecordDTO;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
 import lombok.*;
@@ -77,5 +78,13 @@ public class ProductTemplate extends AuditableEntity {
     }
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    public void updateBasicInfo(
+            ProductTemplateRecordDTO recordDTO
+    ) {
+        this.name = recordDTO.name();
+        this.category = new ProductCategory(recordDTO.categId());
+        this.restaurantTmpl = new RestaurantTemplate(recordDTO.restaurantId());
     }
 }
