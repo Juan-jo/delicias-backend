@@ -46,4 +46,7 @@ public class RestaurantTemplate extends AuditableEntity {
         this.phone = templateDTO.phone();
     }
 
+    public RestaurantTemplate(Integer id) {
+        this.id = id;
+    }
 }
