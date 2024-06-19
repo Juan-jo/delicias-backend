@@ -1,10 +1,10 @@
 package com.delivery.app.product.attribute.models;
 
 import com.delivery.app.configs.auditable.model.AuditableEntity;
+import com.delivery.app.product.template.dtos.ProductTemplateAttributeDTO;
+import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "product_attribute")
@@ -32,8 +32,17 @@ public class ProductAttribute extends AuditableEntity {
 
     private Integer sequence;
 
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+    private RestaurantTemplate restaurantTmpl;
+
     public ProductAttribute(Integer id) {
         this.id = id;
     }
 
+    public void update(ProductTemplateAttributeDTO attributeDTO) {
+        this.name = attributeDTO.name();
+        this.displayType = attributeDTO.displayType();
+        this.sequence = attributeDTO.sequence();
+    }
 }
