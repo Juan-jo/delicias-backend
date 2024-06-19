@@ -726,3 +726,45 @@ databaseChangeLog:
               referencedColumnNames: id
               referencedTableName: restaurant_template
               validate: true
+
+  - changeSet:
+      id: addColumn-example
+      author: liquibase-docs
+      changes:
+        - addColumn:
+            tableName: product_attribute
+            columns:
+              - column:
+                  name: restaurant_id
+                  type: INTEGER
+                  remarks: Restaurant
+        -  addForeignKeyConstraint:
+             baseColumnNames: restaurant_id
+             baseTableName: product_attribute
+             constraintName: product_attribute_restaurant_template_id_fkey
+             referencedColumnNames: id
+             referencedTableName: restaurant_template
+             validate: true
+
+  -  changeSet:
+       id:  2703202416
+       author:  jdev
+       changes:
+         -  createView:
+              encoding:  UTF-8
+              replaceIfExists:  false
+              schemaName:  public
+              selectQuery:  select
+                ptpavr.id ,
+                ptpavr.product_tmpl_id,
+                pav."name" as "name_attr_val" ,
+                pav."sequence" as "sequence_attr_val",
+                pa."name" as "name_attr",
+                pa."sequence" as "sequence_attr",
+                pav.default_extra_price
+                from
+                product_template_product_attribute_value_rel ptpavr
+                join product_attribute_value pav on ptpavr.product_attribute_value_id = pav.id
+                join product_attribute pa on ptpavr.attribute_id = pa.id
+                order by pa."sequence" , pav."sequence"
+              viewName:  product_tmpl_attr_values
