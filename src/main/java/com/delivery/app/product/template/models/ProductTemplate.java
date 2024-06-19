@@ -4,6 +4,7 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.product.attribute.models.ProductAttributeProductTemplateRel;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.category.model.ProductCategory;
+import com.delivery.app.product.template.dtos.ProductTemplateConfigDTO;
 import com.delivery.app.product.template.dtos.ProductTemplateRecordDTO;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
@@ -86,5 +87,15 @@ public class ProductTemplate extends AuditableEntity {
         this.name = recordDTO.name();
         this.category = new ProductCategory(recordDTO.categId());
         this.restaurantTmpl = new RestaurantTemplate(recordDTO.restaurantId());
+    }
+
+    public void updateConfig(ProductTemplateConfigDTO templateConfigDTO) {
+        this.name = templateConfigDTO.name();
+        this.category = new ProductCategory(templateConfigDTO.categId());
+        this.restaurantTmpl = new RestaurantTemplate(templateConfigDTO.restaurantId());
+        this.description = templateConfigDTO.description();
+        this.listPrice = templateConfigDTO.listPrice();;
+        this.salesOK = templateConfigDTO.salesOk();
+        this.active = templateConfigDTO.active();
     }
 }
