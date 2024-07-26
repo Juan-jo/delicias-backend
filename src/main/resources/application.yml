@@ -49,17 +49,22 @@ jwt:
 #  level:
 #    org:
 #      springframework:
-#        security: TRACE
+#        security: TRACE undefined
 
 keycloak:
   use-resource-role-mappings: true
-  realm: delivery-app
-  domain: localhost:8180
+  realm: delicias-app
+  domain: 192.168.101.4:9001
   adminClientId: admin-cli
-  adminClientSecret: 1jXawKyu2BDDqNu0FInFY3sZ2Q82AHEw
-  client: app-auth-id
+  adminClientSecret: PP8mW3FCVO2vbC0dsiJFU6A8czcBokvx
+  client: deliciasapp-auth-client
   urls:
     auth: http://${keycloak.domain}
 
-delivery_app:
+elasticsearch:
+  url: 'https://localhost:9200'
+  apiKey: 'd1h5ZjI1QUJUX1pPSXB6M2RWdlY6UFRpaWpPN21RcVdWTmh5RmZKc1pnQQ=='
+
+delicias_app:
   timezone: America/Mexico_City
+
