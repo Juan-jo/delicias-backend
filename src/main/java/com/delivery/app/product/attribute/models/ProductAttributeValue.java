@@ -1,6 +1,7 @@
 package com.delivery.app.product.attribute.models;
 
 import com.delivery.app.configs.auditable.model.AuditableEntity;
+import com.delivery.app.product.template.dtos.ProductTemplateAttributeValueDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,5 +37,12 @@ public class ProductAttributeValue extends AuditableEntity {
 
     public ProductAttributeValue(Integer id) {
         this.id = id;
+    }
+
+    public void update(ProductTemplateAttributeValueDTO attributeValueDTO) {
+        this.name = attributeValueDTO.name();
+        this.attribute = new ProductAttribute(attributeValueDTO.attributeId());
+        this.extraPrice = attributeValueDTO.extraPrice();
+        this.sequence = attributeValueDTO.sequence();
     }
 }
