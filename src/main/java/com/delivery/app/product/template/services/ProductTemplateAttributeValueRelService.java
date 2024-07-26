@@ -1,5 +1,6 @@
 package com.delivery.app.product.template.services;
 
+import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.product.attribute.models.ProductAttribute;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.attribute.repositories.ProductAttributeValueRepository;
@@ -19,7 +20,7 @@ public class ProductTemplateAttributeValueRelService {
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
     @Transactional
-    public ProductTemplateAttributeValueDTO create(
+    public void create(
             ProductTemplateAttributeValueDTO attributeValueDTO) {
 
         ProductAttributeValue attributeValue = productAttributeValueRepository.save(
@@ -31,7 +32,7 @@ public class ProductTemplateAttributeValueRelService {
                         .build()
         );
 
-        ProductTemplateAttributeValueRel valueRel = templateAttributeValueRelRepository.save(
+        templateAttributeValueRelRepository.save(
                 ProductTemplateAttributeValueRel.builder()
                         .attributeValue(attributeValue)
                         .attribute(new ProductAttribute(attributeValueDTO.attributeId()))
@@ -39,16 +40,51 @@ public class ProductTemplateAttributeValueRelService {
                         .active(true)
                         .build()
         );
-
-        return modelToProductTemplateAttributeValueDTO(valueRel);
     }
 
+    @Transactional(readOnly = true)
+    public ProductTemplateAttributeValueDTO findById(Integer id) {
+
+        return productAttributeValueRepository.findById(id)
+                .map(this::modelToProductTemplateAttributeValueDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("attrVal","id",id));
+    }
+
+    @Transactional
+    public void delete(Integer id) {
+
+        templateAttributeValueRelRepository.deleteByAttributeValueId(id);
+        productAttributeValueRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void update(
+            ProductTemplateAttributeValueDTO attributeValueDTO) {
+
+        ProductAttributeValue attributeValueRel =
+                productAttributeValueRepository.findById(attributeValueDTO.id())
+                        .orElseThrow(() -> new ResourceNotFoundException("attrVal", "id", attributeValueDTO.id()));
+
+        ProductTemplateAttributeValueRel valueRel =
+                templateAttributeValueRelRepository.findByTemplateIdAndAttributeValueId(attributeValueDTO.productTmplId(), attributeValueDTO.id())
+                                .orElseThrow(() -> new ResourceNotFoundException("", "", ""));
+
+        valueRel.setAttribute(new ProductAttribute(attributeValueDTO.attributeId()));
+
+        attributeValueRel.update(attributeValueDTO);
+    }
+
+
     private ProductTemplateAttributeValueDTO modelToProductTemplateAttributeValueDTO(
-            ProductTemplateAttributeValueRel valueRel
+            ProductAttributeValue valueRel
     ) {
 
         return ProductTemplateAttributeValueDTO.builder()
                 .id(valueRel.getId())
+                .attributeId(valueRel.getAttribute().getId())
+                .name(valueRel.getName())
+                .extraPrice(valueRel.getExtraPrice())
+                .sequence(valueRel.getSequence())
                 .build();
     }
 
