@@ -56,6 +56,8 @@ public class ProductTemplate extends AuditableEntity {
 
     private Boolean active;
 
+    private String picture;
+
     @OneToMany(mappedBy = "id.productTemplate")
     private Set<ProductAttributeProductTemplateRel> attributeProductTemplateRels;
 
