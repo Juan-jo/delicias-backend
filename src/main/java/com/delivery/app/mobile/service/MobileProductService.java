@@ -31,9 +31,10 @@ public class MobileProductService {
                         .id(tmpl.getId())
                         .name(tmpl.getName())
                         .listPrice(tmpl.getListPrice())
-                        .picture("https://coffee.alexflipnote.dev/random")
+                        .picture(Optional.ofNullable(tmpl.getPicture()).orElse("https://coffee.alexflipnote.dev/random"))
                         .soldBy("Restaurant name")
                         .rate(random.nextInt(5 - 1 + 1) + 1)
+                        .restaurantName(tmpl.getRestaurantTmpl().getName())
                         .build());
     }
 
@@ -58,7 +59,7 @@ public class MobileProductService {
                 .name(productTemplate.getName())
                 .description(productTemplate.getDescription())
                 .priceList(productTemplate.getListPrice())
-                .picture("https://coffee.alexflipnote.dev/random")
+                .picture(Optional.ofNullable(productTemplate.getPicture()).orElse("https://coffee.alexflipnote.dev/random"))
                 .rate(random.nextInt(5 - 1 + 1) + 1)
                 .restaurant(ProductTemplateDetailDTO.Restaurant.builder()
                         .name(productTemplate.getRestaurantTmpl().getName())
