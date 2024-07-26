@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -38,5 +39,11 @@ public class AuthenticationFacade {
         }
 
         return null;
+    }
+
+    public UUID userId() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return UUID.fromString(authentication.getName());
     }
 }
