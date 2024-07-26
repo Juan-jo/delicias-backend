@@ -9,5 +9,6 @@ public record ProductTemplateItemDTO(
         Double listPrice,
         String picture,
         String soldBy,
-        Integer rate
+        Integer rate,
+        String restaurantName
 ) { }

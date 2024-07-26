@@ -3,6 +3,7 @@ package com.delivery.app.product.template.dtos;
 import com.delivery.app.configs.validation.common.OnUpdate;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
@@ -11,10 +12,10 @@ public record ProductTemplateConfigDTO(
         @NotNull(message = "Id is mandatory", groups = { OnUpdate.class })
         Integer id,
 
+        @Size(max = 50, min = 1, message = "Not valid name. Must have minimum 1 chars or maximum 50 chars.", groups = { OnUpdate.class})
         @NotNull(message = "name is mandatory", groups = { OnUpdate.class })
         String name,
 
-        @NotNull(message = "Description is mandatory", groups = { OnUpdate.class })
         String description,
 
         @NotNull(message = "Category is mandatory", groups = { OnUpdate.class })

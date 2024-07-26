@@ -11,18 +11,20 @@ import lombok.Builder;
 public record ProductTemplateAttributeValueDTO(
         @NotNull(message = "id is mandatory", groups = { OnUpdate.class})
         Integer id,
+
         @NotNull(message = "productTmplId is mandatory", groups = { OnCreate.class})
         Integer productTmplId,
 
-        @NotNull(message = "attributeId is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "attributeId is mandatory", groups = { OnCreate.class, OnUpdate.class })
         Integer attributeId,
 
-        @NotNull(message = "name is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "name is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String name,
 
-        @NotNull(message = "extraPrice is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "extraPrice is mandatory", groups = { OnCreate.class, OnUpdate.class})
         Double extraPrice,
 
+        @NotNull(message = "sequence is mandatory", groups = { OnCreate.class, OnUpdate.class})
         Integer sequence
 ) {
 }
