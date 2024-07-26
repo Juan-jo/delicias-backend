@@ -79,7 +79,7 @@ public class ProductTemplateService {
         return viewProductTmplAttrValueRepository.findByProductTmplId(productTmplId)
                 .stream().map(r-> ProductTmplAttributeRowDTO.builder()
                         .id(r.getId())
-                        .attributeValue(r.getNameAttrValue() + " - " +r.getNameAttr())
+                        .attributeValue(r.getNameAttr() + " - " + r.getNameAttrValue())
                         .sequence(r.getSequenceAttrValue())
                         .extraPrice(r.getExtraPrice())
                         .build()).toList();
