@@ -40,10 +40,19 @@ spring:
   jackson:
     date-format: dd/MM/yyyy HH:mm:ss
 
+  spring:
+    kafka:
+      bootstrap-servers: localhost:9092
+      producer:
+        key-serializer:
+          org.apache.kafka.common.serialization.StringSerializer
+        value-serializer:
+          org.apache.kafka.common.serialization.StringSerializer
+
 jwt:
   auth:
     converter:
-      resource-id: app-auth-id
+      resource-id: deliciasapp-auth-client
 
 #logging:
 #  level:
@@ -54,7 +63,7 @@ jwt:
 keycloak:
   use-resource-role-mappings: true
   realm: delicias-app
-  domain: 192.168.101.4:9001
+  domain: localhost:9001
   adminClientId: admin-cli
   adminClientSecret: PP8mW3FCVO2vbC0dsiJFU6A8czcBokvx
   client: deliciasapp-auth-client
