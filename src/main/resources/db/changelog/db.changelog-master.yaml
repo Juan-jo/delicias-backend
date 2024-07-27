@@ -780,3 +780,110 @@ databaseChangeLog:
                   type: VARCHAR
                   remarks: Image path
             tableName: product_template
+
+  - changeSet:
+      id: 27032024_18
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: pos_restaurant_kanban_id_seq
+        - createTable:
+            tableName: pos_restaurant_kanban
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('pos_restaurant_kanban_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_pos_restaurant_kanban_id
+              - column:
+                  name: order_id
+                  type: INTEGER
+                  remarks: Order Ref
+              - column:
+                  name: restaurant_id
+                  type: INTEGER
+                  remarks: Restaurant Ref
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: pos_restaurant_kanban
+            constraintName: pos_restaurant_kanban_pos_order_fkey
+            referencedColumnNames: id
+            referencedTableName: pos_order
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: restaurant_id
+            baseTableName: pos_restaurant_kanban
+            constraintName: pos_restaurant_kanban_restaurant_template_fkey
+            referencedColumnNames: id
+            referencedTableName: restaurant_template
+            validate: true
+        - createIndex:
+            tableName: pos_restaurant_kanban
+            indexName: idx_pos_restaurant_kanban_restaurant_id
+            columns:
+              - column:
+                  name: restaurant_id
+            using: hash
+
+  - changeSet:
+      id: 27032024_19
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: keycloak_user_id
+                  type: UUID
+                  remarks: Keycloak User ID
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: pos_order
+            indexName: idx_pos_order_keycloak_user_id
+            columns:
+              - column:
+                  name: keycloak_user_id
+
+  - changeSet:
+      id: 27032024_20
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: amount_subtotal
+                  type: FLOAT8
+                  remarks: Subtotal amount
+              - column:
+                  name: amount_discount
+                  type: FLOAT8
+                  remarks: Discount amount
+              - column:
+                  name: cost_service
+                  type: FLOAT8
+                  remarks: Cost service
+
+  - changeSet:
+      id: 27032024_21
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_restaurant_kanban
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR
+                  remarks: Kanban Status
