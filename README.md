@@ -67,3 +67,25 @@ cd /opt/elastic/elasticsearch-8.14.3/config/certs
 ```
 openssl x509 -fingerprint -sha256 -noout -in http_ca.crt
 ```
+
+## Apache Kafka
+
+```
+bin/zookeeper-server-start.sh config/zookeeper.properties
+```
+
+```
+bin/kafka-server-start.sh config/server.properties
+```
+
+```
+bin/kafka-topics.sh --create --topic order --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+```
+
+```
+bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
+```
+
+```
+bin/kafka-console-consumer.sh --topic test --from-beginning --bootstrap-server localhost:9092
+```
