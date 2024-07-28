@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 @Service
 public class ProductTemplateConfigService {
@@ -54,10 +56,10 @@ public class ProductTemplateConfigService {
                 .name(template.getName())
                 .description(template.getDescription())
                 .restaurantId(template.getRestaurantTmpl().getId())
-                .listPrice(template.getListPrice())
+                .listPrice(Optional.ofNullable(template.getListPrice()).orElse(0d))
                 .categId(template.getCategory().getId())
-                .salesOk(template.getSalesOK())
-                .active(template.getActive())
+                .salesOk(Optional.ofNullable(template.getSalesOK()).orElse(false))
+                .active(Optional.ofNullable(template.getActive()).orElse(false))
                 .build();
     }
 
