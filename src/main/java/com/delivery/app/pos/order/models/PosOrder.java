@@ -2,6 +2,7 @@ package com.delivery.app.pos.order.models;
 
 import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.pos.enums.OrderStatus;
+import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,7 +37,18 @@ public class PosOrder extends AuditableEntity {
     @Column(name = "amount_total")
     private Double amountTotal;
 
-    private Integer restaurantId;
+    @Column(name = "amount_subtotal")
+    private Double amountSubtotal;
+
+    @Column(name = "amount_discount")
+    private Double amountDiscount;
+
+    @Column(name = "cost_service")
+    private Double costService;
+
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
+    private RestaurantTemplate restaurantTmpl;
 
     @Column(name = "user_uid")
     private UUID userUID;
@@ -50,4 +62,6 @@ public class PosOrder extends AuditableEntity {
     @OneToMany(mappedBy = "order")
     private Set<PosOrderLine> lines;
 
+    @Column(name = "keycloak_user_id")
+    private UUID userId;
 }
