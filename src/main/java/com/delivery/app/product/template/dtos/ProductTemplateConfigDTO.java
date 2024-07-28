@@ -24,11 +24,11 @@ public record ProductTemplateConfigDTO(
         Integer restaurantId,
 
         @NotNull(message = "list price is mandatory", groups = { OnUpdate.class })
-        Double listPrice,
+        double listPrice,
 
         @NotNull(message = "Id for sale is mandatory", groups = { OnUpdate.class })
-        Boolean salesOk,
+        boolean salesOk,
 
         @NotNull(message = "Active is mandatory", groups = { OnUpdate.class })
-        Boolean active
+        boolean active
 ) { }
