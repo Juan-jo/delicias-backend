@@ -83,9 +83,9 @@ bin/kafka-topics.sh --create --topic order --bootstrap-server localhost:9092 --p
 ```
 
 ```
-bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
+bin/kafka-console-producer.sh --topic order --bootstrap-server localhost:9092
 ```
 
 ```
-bin/kafka-console-consumer.sh --topic test --from-beginning --bootstrap-server localhost:9092
+bin/kafka-console-consumer.sh --topic order --from-beginning --bootstrap-server localhost:9092
 ```
