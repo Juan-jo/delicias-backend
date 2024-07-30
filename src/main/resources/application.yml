@@ -39,15 +39,16 @@ spring:
           issuer-uri: http://${keycloak.domain}/realms/${keycloak.realm}
   jackson:
     date-format: dd/MM/yyyy HH:mm:ss
+#    serialization:
+#      FAIL_ON_EMPTY_BEANS: false
 
-  spring:
-    kafka:
-      bootstrap-servers: localhost:9092
-      producer:
-        key-serializer:
-          org.apache.kafka.common.serialization.StringSerializer
-        value-serializer:
-          org.apache.kafka.common.serialization.StringSerializer
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    producer:
+#      key-serializer:
+#        org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer:
+#        org.apache.kafka.common.serialization.StringSerializer
 
 jwt:
   auth:

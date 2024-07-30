@@ -887,3 +887,23 @@ databaseChangeLog:
                   name: status
                   type: VARCHAR
                   remarks: Kanban Status
+
+  - changeSet:
+      id: 27032024_22
+      author: jdev00000
+      changes:
+        - sql:
+            sql: >-
+              create extension if not exists postgis;
+
+  - changeSet:
+      id: 27032024_23
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: restaurant_template
+            columns:
+              - column:
+                  name: position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud address location
