@@ -132,6 +132,12 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.delicias.kafka.core</groupId>
+			<artifactId>delicias-kafka-core</artifactId>
+			<version>1.0.26</version>
+		</dependency>
 	</dependencies>
 
 	<build>
