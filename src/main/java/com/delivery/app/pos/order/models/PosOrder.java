@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -64,4 +65,9 @@ public class PosOrder extends AuditableEntity {
 
     @Column(name = "keycloak_user_id")
     private UUID userId;
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
 }
