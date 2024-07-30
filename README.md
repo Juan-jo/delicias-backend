@@ -89,3 +89,23 @@ bin/kafka-console-producer.sh --topic order --bootstrap-server localhost:9092
 ```
 bin/kafka-console-consumer.sh --topic order --from-beginning --bootstrap-server localhost:9092
 ```
+
+
+
+
+## Install postgres 16
+```
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install postgresql-16
+```
+
+### Install postgis
+```
+sudo apt-get install postgresql-16-postgis-3
+```
+
+```
+sudo apt-get install postgis
+```
