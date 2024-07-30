@@ -46,7 +46,7 @@ public class PosOrderLine extends AuditableEntity {
     @Column(name = "price_total")
     private Double priceTotal;
 
-    @ManyToMany
+    /*@ManyToMany
     @JoinTable(
             name = "pos_order_line_product_attribute_value_rel",
             joinColumns = @JoinColumn(name = "id"),
@@ -54,7 +54,10 @@ public class PosOrderLine extends AuditableEntity {
             inverseJoinColumns = @JoinColumn(name = "product_attribute_value_id"),
             inverseForeignKey = @ForeignKey(name = "pos_order_line_product_attribute_value_rel_product_attribute_value_id_fkey")
     )
-    private Set<ProductAttributeValue> attributeValues = new HashSet<>();
+    private Set<ProductAttributeValue> attributeValues = new HashSet<>();*/
 
+
+    @OneToMany(mappedBy = "line")
+    private Set<PosOrderLineProductAttributeValueRel> attributeValues = new HashSet<>();
 
 }
