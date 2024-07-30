@@ -1,8 +1,8 @@
 package com.delivery.app.mobile.service;
 
+import com.delicias.kafka.core.dto.KafkaTopicKanbanDTO;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.kafka.dto.KafkaRestaurantKanbanDTO;
-import com.delivery.app.kafka.producer.KafkaOrderProducer;
+import com.delivery.app.kafka.producer.KafkaTopicKanbanProducer;
 import com.delivery.app.mobile.dtos.MobileCreateOrderDTO;
 import com.delivery.app.mobile.exception.MobileOrderDifferentSubtotalAmount;
 import com.delivery.app.mobile.exception.MobileOrderDifferentTotalAmount;
@@ -40,7 +40,7 @@ public class MobileCreateOrderService {
     private final PosOrderLineRepository posOrderLineRepository;
     private final PosOrderLineProductAttributeValueRelRepository posOrderLineProductAttributeValueRelRepository;
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
-    private final KafkaOrderProducer kafkaProducer;
+    private final KafkaTopicKanbanProducer kafkaProducer;
 
     private static final double costService = 35.00;
 
@@ -84,15 +84,23 @@ public class MobileCreateOrderService {
 
         validateAmounts(createOrderDTO, subtotal);
 
-        addRestaurantKanban(newOrder);
+        PosRestaurantKanban kanban = addRestaurantKanban(newOrder);
 
-        kafkaProducer.sendMessage(
-                KafkaRestaurantKanbanDTO.builder()
-                        .orderId(newOrder.getId())
-                        .restaurantId(createOrderDTO.restaurantId())
-                        .build()
-                //String.valueOf(newOrder.getId())
+        KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
+        kafkaTopicKanbanDTO.setRestaurantId(1);
+        kafkaTopicKanbanDTO.setAction("ADD_KANBAN");
+        kafkaTopicKanbanDTO.setId(kanban.getId());
+
+        kafkaProducer.sendMessageTopicKanban(
+                kafkaTopicKanbanDTO
         );
+
+
+        /*kafkaProducer.sendMessageTodo(
+                KafkaTodoDTO.builder()
+                        .name("Juan")
+                        .build()
+        );*/
     }
 
 
@@ -143,14 +151,16 @@ public class MobileCreateOrderService {
     }
 
 
-    private void  addRestaurantKanban(PosOrder posOrder) {
-        posRestaurantKanbanRepository.save(
+    private PosRestaurantKanban  addRestaurantKanban(PosOrder posOrder) {
+         return posRestaurantKanbanRepository.save(
                 PosRestaurantKanban.builder()
                         .status(KanbanStatus.RECEIVED)
                         .order(posOrder)
                         .restaurantTmpl(posOrder.getRestaurantTmpl())
                         .build()
         );
+
+
     }
     private List<ProductTemplate> getProductTemplatesFromDatabase(MobileCreateOrderDTO createOrderDTO) {
         return productTemplateRepository.findByIdIn(
