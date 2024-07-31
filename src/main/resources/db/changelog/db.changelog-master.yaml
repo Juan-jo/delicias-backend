@@ -907,3 +907,45 @@ databaseChangeLog:
                   name: position
                   type: GEOGRAPHY(Point)
                   remarks: longitud, latitud address location
+
+  - changeSet:
+      id: 27032024_24
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: deliverers_id_seq
+        - createTable:
+            tableName: deliverers
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('deliverers_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_deliverers_id
+              - column:
+                  name: deliverer_id
+                  type: UUID
+                  remarks: Deliverer Keycloak User ID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  remarks: Status
+              - column:
+                  name: last_position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud address location
+                  constraints:
+                    nullable: false
