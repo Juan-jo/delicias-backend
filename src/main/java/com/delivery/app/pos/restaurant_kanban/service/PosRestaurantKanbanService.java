@@ -1,11 +1,15 @@
 package com.delivery.app.pos.restaurant_kanban.service;
 
+import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
+import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
+import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.pos.enums.KanbanStatus;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.restaurant_kanban.repository.PosRestaurantKanbanRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class PosRestaurantKanbanService {
 
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
+    private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
 
     @Transactional(readOnly = true)
     public PosRestaurantKanbanDTO loadKanban(Integer restaurantId) {
@@ -75,9 +80,34 @@ public class PosRestaurantKanbanService {
         PosRestaurantKanban restaurantKanban = posRestaurantKanbanRepository.findById(updatePosRestaurantKanbanDTO.id())
                 .orElseThrow();
 
+        Integer orderId = restaurantKanban.getOrder().getId();
+
         restaurantKanban.setStatus(updatePosRestaurantKanbanDTO.status());
+
+        if(updatePosRestaurantKanbanDTO.status().equals(KanbanStatus.READY_TO_DELIVER)) {
+
+            double longitude = restaurantKanban.getRestaurantTmpl().getPosition().getCoordinate().getX();
+            double latitude = restaurantKanban.getRestaurantTmpl().getPosition().getCoordinate().getY();
+
+            searchDelivery(orderId, longitude, latitude);
+        }
+
     }
 
+    @Async
+    void searchDelivery(Integer orderId, double longitude, double latitude) {
+
+        KafkaTopicOrderDTO.Restaurant restaurant = new KafkaTopicOrderDTO.Restaurant();
+        restaurant.setLatitude(latitude);
+        restaurant.setLongitude(longitude);
+
+        KafkaTopicOrderDTO topicOrderDTO = new KafkaTopicOrderDTO();
+        topicOrderDTO.setAction(TOPIC_ORDER_ACTION.SEARCH_DELIVERY);
+        topicOrderDTO.setRestaurant(restaurant);
+        topicOrderDTO.setId(orderId);
+
+        kafkaTopicOrderProducer.sendMessageTopicOrder(topicOrderDTO);
+    }
 
     public PosRestaurantKanbanDTO.Order findKanban(Integer id) {
 
