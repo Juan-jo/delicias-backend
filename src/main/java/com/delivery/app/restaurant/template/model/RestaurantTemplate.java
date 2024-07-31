@@ -4,6 +4,7 @@ import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +33,9 @@ public class RestaurantTemplate extends AuditableEntity {
     private String description;
 
     private String phone;
+
+    @Column(name = "position", columnDefinition = "GEOGRAPHY(Point, 4326)")
+    private Point position;
 
     public LocalDateTime getUpdatedAt() {
         return this.updatedAt;
