@@ -28,6 +28,7 @@ spring:
       hibernate:
         jdbc:
           time_zone: America/Mexico_City
+#        dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   liquibase:
     default-schema: public
@@ -39,6 +40,7 @@ spring:
           issuer-uri: http://${keycloak.domain}/realms/${keycloak.realm}
   jackson:
     date-format: dd/MM/yyyy HH:mm:ss
+# spring.jpa.properties.hibernate.dialect=org.hibernate.spatial.dialect.postgis.PostgisDialect
 #    serialization:
 #      FAIL_ON_EMPTY_BEANS: false
 
@@ -54,7 +56,10 @@ jwt:
   auth:
     converter:
       resource-id: deliciasapp-auth-client
-
+#logging:
+#  level:
+#    org:
+#      hibernate: DEBUG
 #logging:
 #  level:
 #    org:
