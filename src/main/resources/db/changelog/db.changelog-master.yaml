@@ -949,3 +949,56 @@ databaseChangeLog:
                   remarks: longitud, latitud address location
                   constraints:
                     nullable: false
+
+  - changeSet:
+      id: 27032024_25
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: delivery_order_rel_id_seq
+        - createTable:
+            tableName: delivery_order_rel
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('delivery_order_rel_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_delivery_order_rel_id
+              - column:
+                  name: deliverer_id
+                  type: UUID
+                  remarks: Deliverer Keycloak User ID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: INTEGER
+                  remarks: Order ID
+              - column:
+                  name: last_position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud address location
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: delivery_order_rel
+            constraintName: delivery_order_rel_pos_order_fkey
+            referencedColumnNames: id
+            referencedTableName: pos_order
+            validate: true
+        - addUniqueConstraint:
+            columnNames: order_id
+            constraintName: delivery_order_rel_order_id_unique
+            schemaName: public
+            tableName: delivery_order_rel
+            validate: true
