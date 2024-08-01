@@ -109,3 +109,14 @@ sudo apt-get install postgresql-16-postgis-3
 ```
 sudo apt-get install postgis
 ```
+
+Delivers test
+
+```
+INSERT INTO deliverers (deliverer_id, status, last_position)
+values
+('f6b6dac3-31c8-4fb7-bbb8-53f3bcc0b64d', 'AVAILABLE',ST_SetSRID(ST_MakePoint(-98.4046764,21.1340376), 4326)),
+('1c342964-f96c-4c45-aa84-e756e7e559d0', 'AVAILABLE', ST_SetSRID(ST_MakePoint(-98.4035307,21.1374573), 4326)),
+('12a69727-1516-4aaf-8ea6-ccecbfd6c318', 'AVAILABLE',ST_SetSRID(ST_MakePoint(-98.4059367,21.1431475), 4326)),   
+('93c24b49-b204-4e0e-9831-58d9e68b1581', 'AVAILABLE',ST_SetSRID(ST_MakePoint(-98.4069396, 21.1435666), 4326));
+```
