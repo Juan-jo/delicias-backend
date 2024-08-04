@@ -1002,3 +1002,56 @@ databaseChangeLog:
             schemaName: public
             tableName: delivery_order_rel
             validate: true
+
+  - changeSet:
+      id: 27032024_26
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: deliverers
+            columns:
+              - column:
+                  name: destination_position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud when status ROAD_TO_STORE | ROAD_TO_DELIVERY
+
+  - changeSet:
+      id: 27032024_27
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              CREATE TYPE deliver_order_rel_status_type AS ENUM ('NOT_STARTED', 'ROAD_DELIVERY', 'FINISHED');
+        - addColumn:
+            tableName: delivery_order_rel
+            columns:
+              - column:
+                  name: status
+                  type: deliver_order_rel_status_type
+                  remarks: Status
+
+  - changeSet:
+      id: 27032024_28
+      author: jdev
+      changes:
+        - dropColumn:
+            columnName: status
+            tableName: deliverers
+        - sql:
+            sql: >-
+              CREATE TYPE deliver_status_type AS ENUM ('AVAILABLE', 'ASSIGNED_ORDERS');
+        - addColumn:
+            tableName: deliverers
+            columns:
+              - column:
+                  name: status
+                  type: deliver_status_type
+                  remarks: Status
+
+  - changeSet:
+      id: 27032024_29
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              ALTER TYPE deliver_order_rel_status_type ADD VALUE 'ROAD_TO_STORE';
