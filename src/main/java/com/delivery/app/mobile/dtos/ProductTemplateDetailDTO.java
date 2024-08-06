@@ -22,6 +22,7 @@ public record ProductTemplateDetailDTO(
 
     @Builder
     public record Restaurant(
+            Integer id,
             String name,
             String picture
     ) { }
