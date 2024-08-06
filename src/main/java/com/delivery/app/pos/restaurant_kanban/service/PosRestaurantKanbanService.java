@@ -2,12 +2,15 @@ package com.delivery.app.pos.restaurant_kanban.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
 import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
+import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.pos.enums.KanbanStatus;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.restaurant_kanban.repository.PosRestaurantKanbanRepository;
+import com.delivery.app.restaurant.template.model.RestaurantTemplate;
+import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -24,9 +27,13 @@ public class PosRestaurantKanbanService {
 
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
     private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
+    private final RestaurantTemplateRepository restaurantTemplateRepository;
 
     @Transactional(readOnly = true)
     public PosRestaurantKanbanDTO loadKanban(Integer restaurantId) {
+
+        RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("RestaurantTmpl", "id", restaurantId));
 
         Map<KanbanStatus, List<PosRestaurantKanbanDTO.Order>> kanbanMap = posRestaurantKanbanRepository.findByRestaurantTmplId(restaurantId)
                 .stream()
@@ -68,7 +75,7 @@ public class PosRestaurantKanbanService {
         );
 
         return  PosRestaurantKanbanDTO.builder()
-                .label("")
+                .label(restaurantTemplate.getName())
                 .children(list)
                 .build();
     }
@@ -127,7 +134,9 @@ public class PosRestaurantKanbanService {
                                         .collect(Collectors.joining(", ")))
                                 .build()).toList())
                 .build()
-        ).orElseThrow();
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("load kanban", "id", id)
+        );
 
 
     }
