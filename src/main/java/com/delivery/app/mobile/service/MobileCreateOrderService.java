@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -64,7 +65,7 @@ public class MobileCreateOrderService {
                     .findFirst()
                     .orElseThrow(() -> new ResourceNotFoundException("ProductTmpl", "id", productTmpl.id()));
 
-            List<Integer> attrValuesId = productTmpl.attrValues().stream()
+            List<Integer> attrValuesId = Optional.ofNullable(productTmpl.attrValues()).orElse(List.of()).stream()
                     .map(MobileCreateOrderDTO.AttrValue::id).toList();
 
             List<ProductAttrValue> productAtrValues = currentTmpl.getAttributeValues().stream()
@@ -87,7 +88,7 @@ public class MobileCreateOrderService {
         PosRestaurantKanban kanban = addRestaurantKanban(newOrder);
 
         KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
-        kafkaTopicKanbanDTO.setRestaurantId(1);
+        kafkaTopicKanbanDTO.setRestaurantId(createOrderDTO.restaurantId());
         kafkaTopicKanbanDTO.setAction("ADD_KANBAN");
         kafkaTopicKanbanDTO.setId(kanban.getId());
 
