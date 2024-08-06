@@ -41,8 +41,6 @@ public record MobileCreateOrderDTO(
             @NotNull(message = "The parameter is mandatory.", groups = { OnCreate.class })
             Integer qty,
 
-            @Valid
-            @NotEmpty(message = "The parameter is mandatory.", groups = { OnCreate.class })
             List<AttrValue> attrValues
     ) { }
 
