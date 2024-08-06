@@ -1055,3 +1055,83 @@ databaseChangeLog:
         - sql:
             sql: >-
               ALTER TYPE deliver_order_rel_status_type ADD VALUE 'ROAD_TO_STORE';
+
+  - changeSet:
+      id: 27032024_30
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: user_address_id_seq
+        - createTable:
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('user_address_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_address_id
+              - column:
+                  name: keycloak_user_id
+                  type: UUID
+                  remarks: Keycloak User ID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  remarks: Name(Home, Dpto, Work, etc..)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud address location
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 27032024_31
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: user_address_id
+                  type: Integer
+                  remarks: User Address
+        - addForeignKeyConstraint:
+            baseColumnNames: user_address_id
+            baseTableName: pos_order
+            constraintName: pos_order_user_addresses_fkey
+            referencedColumnNames: id
+            referencedTableName: user_addresses
+            validate: true
+
+  - changeSet:
+      id: 27032024_32
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              ALTER TABLE delivery_order_rel DROP COLUMN status;
+              DROP TYPE deliver_order_rel_status_type;
+              CREATE TYPE deliver_order_rel_status_type AS ENUM ('NOT_STARTED', 'ROAD_TO_STORE', 'ROAD_TO_DELIVERY', 'FINISHED');
+        - addColumn:
+            tableName: delivery_order_rel
+            columns:
+              - column:
+                  name: status
+                  type: deliver_order_rel_status_type
+                  remarks: Status
