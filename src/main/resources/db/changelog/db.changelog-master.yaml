@@ -1135,3 +1135,59 @@ databaseChangeLog:
                   name: status
                   type: deliver_order_rel_status_type
                   remarks: Status
+
+  - changeSet:
+      id: 27032024_33
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: restaurant_menu_seq
+        - createTable:
+            tableName: restaurant_menu
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('restaurant_menu_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_restaurant_menu_id
+              - column:
+                  name: name
+                  type: CITEXT
+                  remarks: Name menu
+                  constraints:
+                    nullable: false
+              - column:
+                  name: restaurant_id
+                  type: INTEGER
+                  remarks: Restaurant Ref
+                  constraints:
+                    nullable: false
+              - column:
+                  name: available
+                  type: BOOL
+                  defaultValueBoolean: false
+                  remarks: Is available
+        - addUniqueConstraint:
+            columnNames: name, restaurant_id
+            constraintName: restaurant_menu_name_restaurant_id_unique
+            schemaName: public
+            tableName: restaurant_menu
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: restaurant_id
+            baseTableName: restaurant_menu
+            constraintName: restaurant_menu_restaurant_template_fkey
+            referencedColumnNames: id
+            referencedTableName: restaurant_template
+            validate: true
