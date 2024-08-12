@@ -30,5 +30,7 @@ public record ProductTemplateConfigDTO(
         boolean salesOk,
 
         @NotNull(message = "Active is mandatory", groups = { OnUpdate.class })
-        boolean active
+        boolean active,
+
+        String picture
 ) { }
