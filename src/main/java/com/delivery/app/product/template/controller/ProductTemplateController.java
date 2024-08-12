@@ -14,8 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -93,4 +96,14 @@ public class ProductTemplateController {
         return productTemplateService.searchFilter(reqFilterRowsDTO);
     }
 
+
+    @PutMapping("/picture")
+    public ResponseEntity<Map<String, String>> uploadPicture(
+            @NotNull @RequestParam("productTmplId") Integer productTmplId,
+            @NotNull @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return ResponseEntity.ok(
+                productTemplateService.uploadFile(productTmplId, file)
+        );
+    }
 }
