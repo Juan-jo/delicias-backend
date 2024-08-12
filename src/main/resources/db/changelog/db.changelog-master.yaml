@@ -1203,3 +1203,85 @@ databaseChangeLog:
                   name: products_tmpl
                   type: int[]
                   remarks: List of Id`s products template
+
+  -  changeSet:
+       id: 27032024_35
+       author: jdev
+       changes:
+         -  createTable:
+              tableName: mobile_config
+              columns:
+                -  column:
+                     name: id
+                     type: INTEGER
+                     remarks: ID Unique, PK
+                - column:
+                    name: available_restaurants
+                    type: int[]
+                    remarks: List of Id`s restaurants template
+                - column:
+                    name: cost_service
+                    type: FLOAT8
+                - column:
+                    name: zone_center_location
+                    type: GEOGRAPHY(Point)
+         - sql:
+             sql: >-
+               INSERT INTO mobile_config(id, cost_service, zone_center_location) VALUES(27032024, 35, 'SRID=4326;POINT (-98.410801 21.143786)'::public.geography);
+
+  - changeSet:
+      id: 27032024_36
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: restaurant_schedule_id_seq
+        -  createTable:
+             tableName: restaurant_schedule
+             columns:
+               -  column:
+                    name: id
+                    type: INTEGER
+                    remarks: ID Unique, PK
+                    defaultValueComputed: nextval('restaurant_schedule_id_seq')
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: pk_restaurant_schedule_id
+               - column:
+                   name: restaurant_id
+                   type: INTEGER
+                   remarks: Restaurant Ref
+               - column:
+                   name: day_of_week
+                   type: VARCHAR(10)
+               - column:
+                   name: start_time
+                   type: TIME WITHOUT TIME ZONE
+               - column:
+                   name: end_time
+                   type: TIME WITHOUT TIME ZONE
+               - column:
+                   name: available
+                   type: BOOL
+                   defaultValueBoolean: false
+                   remarks: Is available
+        - addUniqueConstraint:
+            columnNames: restaurant_id, day_of_week
+            constraintName: restaurant_schedule_restaurant_id_day_of_week_unique
+            schemaName: public
+            tableName: restaurant_schedule
+            validate: true
+        - addForeignKeyConstraint:
+            baseColumnNames: restaurant_id
+            baseTableName: restaurant_schedule
+            constraintName: restaurant_schedule_restaurant_template_fkey
+            referencedColumnNames: id
+            referencedTableName: restaurant_template
+            validate: true
