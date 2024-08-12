@@ -2,7 +2,7 @@ package com.delivery.app.mobile.controller;
 
 import com.delivery.app.configs.validation.common.OnFilter;
 import com.delivery.app.mobile.dtos.ProductFilterRequestDTO;
-import com.delivery.app.mobile.dtos.ProductTemplateDetailDTO;
+import com.delivery.app.mobile.dtos.MobileProductTmplDetailDTO;
 import com.delivery.app.mobile.dtos.ProductTemplateItemDTO;
 import com.delivery.app.mobile.service.MobileProductService;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class MobileProductController {
     }
 
     @GetMapping("/{tmplId}")
-    public ResponseEntity<ProductTemplateDetailDTO> findById(
+    public ResponseEntity<MobileProductTmplDetailDTO> findById(
             @Valid @PathVariable Integer tmplId
     ) {
         return ResponseEntity.ok(
