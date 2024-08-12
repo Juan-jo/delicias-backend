@@ -1,5 +1,6 @@
 package com.delivery.app.product.template.services;
 
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.constants.RoleType;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.product.category.model.ProductCategory;
@@ -9,13 +10,17 @@ import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.product.template.repositories.ViewProductTmplAttrValueRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.security.services.AuthenticationFacade;
+import com.delivery.app.utils.DeliciasFileUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -25,6 +30,9 @@ public class ProductTemplateService {
     private final ProductTemplateRepository productTemplateRepository;
     private final AuthenticationFacade authenticationFacade;
     private final ViewProductTmplAttrValueRepository viewProductTmplAttrValueRepository;
+
+    private final DeliciasFileUtils deliciasFileUtils;
+    private final DeliciasAppProperties deliciasAppProperties;
 
     public ProductTemplateDTO findById(Integer tmplId) {
 
@@ -71,6 +79,20 @@ public class ProductTemplateService {
         return ProductTemplateRecordDTO.builder()
                 .id(productTemplate.getId())
                 .build();
+    }
+
+    @Transactional
+    public Map<String, String> uploadFile(Integer productTmplId, MultipartFile file) throws IOException {
+
+        ProductTemplate productTemplate = productTemplateRepository.findById(productTmplId)
+                .orElseThrow(() -> new ResourceNotFoundException("productTmpl", "id", productTmplId));
+
+
+        String fileName = deliciasFileUtils.saveFile(file);
+
+        productTemplate.setPicture(fileName);
+
+        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getCoverSize(), fileName));
     }
 
     public List<ProductTmplAttributeRowDTO> attributeValuesRowDTOS(Integer productTmplId) {
