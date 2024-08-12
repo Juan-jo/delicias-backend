@@ -1,5 +1,6 @@
 package com.delivery.app.mobile.service;
 
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.mobile.dtos.MobileRestaurantDetailDTO;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
@@ -20,6 +21,7 @@ public class MobileRestaurantService {
     private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final ProductTemplateRepository productTemplateRepository;
     private final RestaurantTmplMenuRepository restaurantTmplMenuRepository;
+    private final DeliciasAppProperties deliciasAppProperties;
 
     public MobileRestaurantDetailDTO detail(Integer restaurantId) {
 
@@ -67,7 +69,9 @@ public class MobileRestaurantService {
         ).stream().map(r -> MobileRestaurantDetailDTO.ProductMenu.builder()
                         .id(r.getId())
                         .name(r.getName())
-                        .picture(Optional.ofNullable(r.getPicture()).orElse("https://picsum.photos/200"))
+                        .picture(Optional.ofNullable(r.getPicture())
+                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getCoverSize(), p))
+                                .orElse("https://picsum.photos/200"))
                         .priceList(r.getListPrice())
                         .build())
                 .toList();
