@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Set;
 
 @Builder
-public record ProductTemplateDetailDTO(
+public record MobileProductTmplDetailDTO(
         Integer id,
         String name,
         String description,
@@ -17,6 +16,7 @@ public record ProductTemplateDetailDTO(
         Integer rate,
         Double priceList,
         Restaurant restaurant,
+        int qty,
         List<Attribute> attributes
 ) {
 
@@ -54,7 +54,6 @@ public record ProductTemplateDetailDTO(
     public record AttributeValue(
             String name,
             Integer id,
-            String displayType,
             Double extraPrice,
             String picture
     ) { }
