@@ -1,17 +1,20 @@
 package com.delivery.app.mobile.service;
 
 
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.mobile.dtos.ProductFilterRequestDTO;
-import com.delivery.app.mobile.dtos.ProductTemplateDetailDTO;
+import com.delivery.app.mobile.dtos.MobileProductTmplDetailDTO;
 import com.delivery.app.mobile.dtos.ProductTemplateItemDTO;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.template.models.ProductTemplate;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class MobileProductService {
 
     private final ProductTemplateRepository productTemplateRepository;
+    private final DeliciasAppProperties deliciasAppProperties;
 
     public Page<ProductTemplateItemDTO> loadProductTemplate(
             ProductFilterRequestDTO productFilterRequestDTO) {
@@ -38,7 +42,7 @@ public class MobileProductService {
                         .build());
     }
 
-    public ProductTemplateDetailDTO detail(Integer id) {
+    public MobileProductTmplDetailDTO detail(Integer id) {
 
         ProductTemplate productTemplate = productTemplateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("template", "id", id));
@@ -46,7 +50,7 @@ public class MobileProductService {
 
         Random random = new Random();
 
-        List<ProductTemplateDetailDTO.Attribute> attributes = getAttributes(productTemplate);
+        List<MobileProductTmplDetailDTO.Attribute> attributes = getAttributes(productTemplate);
 
 
         Optional.ofNullable(attributes).ifPresent(a -> {
@@ -54,14 +58,17 @@ public class MobileProductService {
         });
 
 
-        return ProductTemplateDetailDTO.builder()
+        return MobileProductTmplDetailDTO.builder()
                 .id(productTemplate.getId())
                 .name(productTemplate.getName())
                 .description(productTemplate.getDescription())
                 .priceList(productTemplate.getListPrice())
-                .picture(Optional.ofNullable(productTemplate.getPicture()).orElse("https://coffee.alexflipnote.dev/random"))
+                .picture(Optional.ofNullable(productTemplate.getPicture())
+                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getCoverSize(), d))
+                        .orElse("https://coffee.alexflipnote.dev/random"))
                 .rate(random.nextInt(5 - 1 + 1) + 1)
-                .restaurant(ProductTemplateDetailDTO.Restaurant.builder()
+                .qty(1)
+                .restaurant(MobileProductTmplDetailDTO.Restaurant.builder()
                         .id(productTemplate.getRestaurantTmpl().getId())
                         .name(productTemplate.getRestaurantTmpl().getName())
                         .picture("https://coffee.alexflipnote.dev/random")
@@ -73,7 +80,7 @@ public class MobileProductService {
                                                 productTemplate.getAttributeValues().stream()
                                                         .filter(i -> i.getAttribute().getId().equals(attrVal.getId()))
                                                         .sorted(Comparator.comparing(ProductAttributeValue::getSequence))
-                                                        .map(val -> ProductTemplateDetailDTO.AttributeValue.builder()
+                                                        .map(val -> MobileProductTmplDetailDTO.AttributeValue.builder()
                                                                 .id(val.getId())
                                                                 .extraPrice(val.getExtraPrice())
                                                                 .name(val.getName())
@@ -85,12 +92,12 @@ public class MobileProductService {
                 ).build();
     }
 
-    private static List<ProductTemplateDetailDTO.Attribute> getAttributes(ProductTemplate productTemplate) {
+    private static List<MobileProductTmplDetailDTO.Attribute> getAttributes(ProductTemplate productTemplate) {
         return Optional.ofNullable(productTemplate.getAttributeValues()).map(
                 attributeValues -> attributeValues.stream()
                         .collect(Collectors.groupingBy(ProductAttributeValue::getAttribute))
                         .keySet()
-                        .stream().map(s -> ProductTemplateDetailDTO.Attribute.builder()
+                        .stream().map(s -> MobileProductTmplDetailDTO.Attribute.builder()
                                 .id(s.getId())
                                 .name(s.getName())
                                 .displayType(s.getDisplayType())
