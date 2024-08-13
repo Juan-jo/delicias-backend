@@ -23,7 +23,4 @@ public class KafkaTopicKanbanProducer {
         kafkaTemplate.send(TOPIC, message);
     }
 
-    // TODO multiple send DTO in TOPIC (Config DTO -> com.delicias.kafka.core.dto)
-    // public void sendMessageTodo(KafkaTodoDTO message) { kafkaTemplate.send("test", message); }
-
 }
