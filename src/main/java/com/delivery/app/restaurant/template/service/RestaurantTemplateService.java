@@ -1,5 +1,6 @@
 package com.delivery.app.restaurant.template.service;
 
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateReqFilterRows;
@@ -7,13 +8,17 @@ import com.delivery.app.restaurant.template.dto.RestaurantTemplateRow;
 import com.delivery.app.restaurant.template.dto.RestaurantTmplOptionDTO;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
+import com.delivery.app.utils.DeliciasFileUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Service
@@ -21,6 +26,9 @@ public class RestaurantTemplateService {
 
     private final RestaurantTemplateRepository restaurantTemplateRepository;
 
+
+    private final DeliciasFileUtils deliciasFileUtils;
+    private final DeliciasAppProperties deliciasAppProperties;
 
     @Transactional
     public RestaurantTemplateDTO create(RestaurantTemplateDTO templateDTO) {
@@ -91,6 +99,32 @@ public class RestaurantTemplateService {
                         .name(r.getName())
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public Map<String, String> uploadCover(Integer restaurantTmplId, MultipartFile cover) throws IOException {
+
+        RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(restaurantTmplId)
+                .orElseThrow(() -> new ResourceNotFoundException("restaurantTpml", "id", restaurantTmplId));
+
+        String fileName = deliciasFileUtils.saveFile(cover);
+
+        restaurantTemplate.setImageCover(fileName);
+
+        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
+    }
+
+    @Transactional
+    public Map<String, String> uploadLogo(Integer restaurantTmplId, MultipartFile logo) throws IOException {
+
+        RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(restaurantTmplId)
+                .orElseThrow(() -> new ResourceNotFoundException("restaurantTpml", "id", restaurantTmplId));
+
+        String fileName = deliciasFileUtils.saveFile(logo);
+
+        restaurantTemplate.setImageLogo(fileName);
+
+        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
     }
 
     private RestaurantTemplateDTO modelToRestaurantTemplateDTO(RestaurantTemplate template) {
