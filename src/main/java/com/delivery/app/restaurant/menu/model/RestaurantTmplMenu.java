@@ -37,4 +37,6 @@ public class RestaurantTmplMenu {
 
     private boolean available;
 
+    private Integer sequence;
+
 }
