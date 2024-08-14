@@ -3,6 +3,14 @@ server:
   servlet:
     context-path: /
 
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        orm:
+#          jdbc:
+#            bind: trace
+
 spring:
   main:
     banner-mode: off
@@ -26,8 +34,9 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
+        #format_sql: true
         jdbc:
-          time_zone: America/Mexico_City
+          time_zone: UTC
 #        dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   liquibase:
@@ -69,7 +78,7 @@ jwt:
 keycloak:
   use-resource-role-mappings: true
   realm: delicias-app
-  domain: localhost:9001
+  domain: 192.168.101.16:9001 # localhost:9001 #192.168.101.16:9001
   adminClientId: admin-cli
   adminClientSecret: PP8mW3FCVO2vbC0dsiJFU6A8czcBokvx
   client: deliciasapp-auth-client
@@ -80,6 +89,12 @@ elasticsearch:
   url: 'https://localhost:9200'
   apiKey: 'd1h5ZjI1QUJUX1pPSXB6M2RWdlY6UFRpaWpPN21RcVdWTmh5RmZKc1pnQQ=='
 
-delicias_app:
-  timezone: America/Mexico_City
+delicias:
+  timezone: -6 #America/Mexico_City
+  files:
+    server: 'http://192.168.101.16:9095'
+    resources: ${delicias.files.server}/resources
+    staticDefault: ${delicias.files.server}/static/dl.png
+    upload:
+      path: '/home/jdev/delicias_cloud'
 

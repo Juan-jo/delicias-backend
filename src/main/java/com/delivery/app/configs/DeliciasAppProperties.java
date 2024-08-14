@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 @Setter
 public class DeliciasAppProperties {
 
-    String timezone;
+    Integer timezone;
     private CloudFiles files;
 
     @Getter
     @Setter
     public static class CloudFiles {
-        private String coverSize;
+        private String resources;
+        private String staticDefault;
         private String server;
         private UploadFile upload;
 

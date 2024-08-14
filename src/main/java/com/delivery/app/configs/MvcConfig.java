@@ -14,5 +14,8 @@ public class MvcConfig implements WebMvcConfigurer {
         registry
                 .addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
+
+        registry.addResourceHandler("/resources/**")
+                .addResourceLocations("file:/home/jdev/delicias_cloud/");
     }
 }
