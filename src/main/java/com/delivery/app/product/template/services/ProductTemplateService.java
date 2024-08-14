@@ -92,7 +92,7 @@ public class ProductTemplateService {
 
         productTemplate.setPicture(fileName);
 
-        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getCoverSize(), fileName));
+        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
     }
 
     public List<ProductTmplAttributeRowDTO> attributeValuesRowDTOS(Integer productTmplId) {
