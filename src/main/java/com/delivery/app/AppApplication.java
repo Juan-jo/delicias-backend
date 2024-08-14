@@ -11,7 +11,7 @@ import java.util.TimeZone;
 @EnableAsync
 public class AppApplication {
 
-	private static final String DEFAULT_TIME_ZONE = "America/Mexico_City";
+	private static final String DEFAULT_TIME_ZONE = "UTC";
 
 
 	public static void main(String[] args) {
