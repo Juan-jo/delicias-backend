@@ -27,4 +27,6 @@ public interface ProductTemplateRepository extends JpaRepository<ProductTemplate
             Integer restaurantId,
             Pageable pageable
     );
+
+    List<ProductTemplate> findByRestaurantTmplId(Integer restaurantId);
 }
