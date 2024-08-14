@@ -120,3 +120,18 @@ values
 ('12a69727-1516-4aaf-8ea6-ccecbfd6c318', 'AVAILABLE',ST_SetSRID(ST_MakePoint(-98.4059367,21.1431475), 4326)),   
 ('93c24b49-b204-4e0e-9831-58d9e68b1581', 'AVAILABLE',ST_SetSRID(ST_MakePoint(-98.4069396, 21.1435666), 4326));
 ```
+
+### Reducir calidad de imagen
+#### Instalacion
+```
+sudo apt-get install imagemagick
+```
+#### Reducir calidad
+```
+convert suizas_comida.png -quality 20 1723236657811_12.jpg
+```
+
+#### Ajustar tamaño
+```
+magick input.jpg -resize 800x600 output.jpg
+```
