@@ -1285,3 +1285,47 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: restaurant_template
             validate: true
+
+  - changeSet:
+      id: 27032024_37
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: restaurant_menu
+            columns:
+              - column:
+                  name: sequence
+                  type: INTEGER
+                  remarks: Sequence menu mobile
+
+  - changeSet:
+      id: 27032024_38
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: restaurant_template
+            columns:
+              - column:
+                  name: recommended_products_tmpl
+                  type: int[]
+                  remarks: Recommended ID`s products tmpl
+
+  - changeSet:
+      id: 27032024_39
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: restaurant_template
+            columns:
+              - column:
+                  name: address
+                  type: VARCHAR(80)
+                  remarks:
+              - column:
+                  name: image_cover
+                  type: VARCHAR(50)
+                  remarks: Cover mobile image
+              - column:
+                  name: image_logo
+                  type: VARCHAR(50)
+                  remarks: Logo mobile image
