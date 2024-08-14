@@ -65,7 +65,7 @@ public class ProductTemplateConfigService {
                 .salesOk(Optional.ofNullable(template.getSalesOK()).orElse(false))
                 .active(Optional.ofNullable(template.getActive()).orElse(false))
                 .picture(Optional.ofNullable(template.getPicture())
-                        .map(p -> String.format("%s/%s",deliciasAppProperties.getFiles().getCoverSize(), p))
+                        .map(p -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), p))
                         .orElse(null)
                 )
                 .build();

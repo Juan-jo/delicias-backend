@@ -16,8 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -87,6 +90,37 @@ public class RestaurantTemplateController {
                 restaurantTemplateService.tmplOptionDTOList()
         );
 
+    }
+
+
+    @PutMapping("/picture")
+    public ResponseEntity<Map<String, String>> uploadPicture(
+            @NotNull @RequestParam("restaurantTmplId") Integer restaurantTmplId,
+            @NotNull @RequestParam("typeImage") TYPE_IMAGE typeImage,
+            @NotNull @RequestParam("file") MultipartFile file
+    ) throws IOException {
+
+        if(typeImage.equals(TYPE_IMAGE.COVER)) {
+
+            return ResponseEntity.ok(
+                    restaurantTemplateService.uploadCover(restaurantTmplId, file)
+            );
+        }
+
+        else if(typeImage.equals(TYPE_IMAGE.LOGO)) {
+
+            return ResponseEntity.ok(
+                    restaurantTemplateService.uploadLogo(restaurantTmplId, file)
+            );
+        }
+
+        return null;
+    }
+
+
+    public enum TYPE_IMAGE {
+        COVER,
+        LOGO
     }
 
 }

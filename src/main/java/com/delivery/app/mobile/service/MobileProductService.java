@@ -10,11 +10,9 @@ import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.template.models.ProductTemplate;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,8 +62,8 @@ public class MobileProductService {
                 .description(productTemplate.getDescription())
                 .priceList(productTemplate.getListPrice())
                 .picture(Optional.ofNullable(productTemplate.getPicture())
-                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getCoverSize(), d))
-                        .orElse("https://coffee.alexflipnote.dev/random"))
+                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), d))
+                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
                 .rate(random.nextInt(5 - 1 + 1) + 1)
                 .qty(1)
                 .restaurant(MobileProductTmplDetailDTO.Restaurant.builder()

@@ -1,6 +1,9 @@
 package com.delivery.app.mobile.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+
+import java.time.LocalTime;
 import java.util.List;
 
 @Builder
@@ -16,8 +19,15 @@ public record MobileRestaurantDetailDTO(
     @Builder
     public record RestaurantInfo(
             String imageLogo,
-            String hourStart,
-            String hourEnd,
+
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm a")
+            LocalTime hourStart,
+
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm a")
+            LocalTime hourEnd,
+
+            boolean available,
+
             String address
     ) { }
 
