@@ -151,6 +151,22 @@
 			<version>2.14.0</version>
 		</dependency>
 
+
+
+		<!-- Start dependencies google maps -->
+		<dependency>
+			<groupId>com.google.maps</groupId>
+			<artifactId>google-maps-services</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<!-- End dependencies google maps -->
+
 		<!-- https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-60 -->
 		<!--<dependency>
 			<groupId>com.vladmihalcea</groupId>

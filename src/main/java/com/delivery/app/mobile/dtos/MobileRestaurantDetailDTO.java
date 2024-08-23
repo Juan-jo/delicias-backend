@@ -42,7 +42,6 @@ public record MobileRestaurantDetailDTO(
 
     @Builder
     public record Menu(
-            Integer id,
             String name,
             List<ProductMenu> products
     ) {}
@@ -52,6 +51,7 @@ public record MobileRestaurantDetailDTO(
             Integer id,
             String name,
             String picture,
-            double priceList
+            double priceList,
+            String description
             ) {}
 }

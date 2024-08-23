@@ -12,10 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -89,4 +92,17 @@ public class KeycloakUserApiController {
         return roleService.getRoles();
     }
 
+
+    @GetMapping("/address")
+    public ResponseEntity<List<UserAddressDTO>> loadAddress(
+            Principal principal
+    ) {
+
+        String keycloakUserId = principal.getName();
+
+        return ResponseEntity.ok(
+                keycloakUserService.loadAddress(UUID.fromString(keycloakUserId))
+        );
+
+    }
 }

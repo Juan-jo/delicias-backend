@@ -66,7 +66,6 @@ public class MobileRestaurantService {
                         )
                         .menu(restaurantTmpl.getMenus().stream()
                                 .map(menu -> new MobileRestaurantDetailDTO.Menu(
-                                        menu.getId(),
                                         menu.getName(),
                                         allProducts.stream()
                                                 .filter(product -> menu.getProductsTmpl().contains(product.id()))
@@ -75,6 +74,7 @@ public class MobileRestaurantService {
                                                         .name(a.name())
                                                         .picture(a.picture())
                                                         .priceList(a.listPrice())
+                                                        .description(a.description())
                                                         .build()).toList())
                                 )
                                 .toList())
@@ -91,6 +91,7 @@ public class MobileRestaurantService {
         menuIds.addAll(Optional.ofNullable(recommended).orElse(List.of()));
 
         return productTemplateRepository.findByIdIn(menuIds).stream()
+                .filter(f -> Optional.ofNullable(f.getListPrice()).orElse(0d) > 0)
                 .map(r -> new ProductItem(
                         r.getId(),
                         r.getName(),
@@ -98,7 +99,8 @@ public class MobileRestaurantService {
                                 .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
                                 .orElse(deliciasAppProperties.getFiles().getStaticDefault()),
                         r.getListPrice(),
-                        r.getCategory().getName()
+                        r.getCategory().getName(),
+                        r.getDescription()
                 ))
                 .toList();
     }
@@ -109,7 +111,8 @@ public class MobileRestaurantService {
             String name,
             String picture,
             double listPrice,
-            String categName
+            String categName,
+            String description
     ){ }
 
 }

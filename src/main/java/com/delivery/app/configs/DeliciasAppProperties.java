@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 @Setter
 public class DeliciasAppProperties {
 
-    Integer timezone;
+    private Boolean production;
+    private Integer timezone;
     private CloudFiles files;
 
     @Getter

@@ -1329,3 +1329,53 @@ databaseChangeLog:
                   name: image_logo
                   type: VARCHAR(50)
                   remarks: Logo mobile image
+
+  - changeSet:
+      id: 27032024_40
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: type_address
+                  type: VARCHAR(30)
+                  remarks: Type Address - Casa, Depto, Office
+              - column:
+                  name: details
+                  type: VARCHAR(250)
+                  remarks: When is HOME, DEPTO
+              - column:
+                  name: company_name
+                  type: VARCHAR(250)
+                  remarks: When is OFFICE
+              - column:
+                  name: street
+                  type: VARCHAR(250)
+                  remarks: Street
+              - column:
+                  name: address
+                  type: VARCHAR(250)
+                  remarks: Address, country, city
+
+  - changeSet:
+      id: 27032024_41
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: indications
+                  type: VARCHAR(250)
+                  remarks: Deliverer indications
+  -  changeSet:
+       id:  27032024_42
+       author:  jdev
+       changes:
+         -  dropColumn:
+              columns:
+                -  column:
+                     name: name
+              schemaName: public
+              tableName: user_addresses

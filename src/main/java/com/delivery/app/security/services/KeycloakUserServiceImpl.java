@@ -4,6 +4,7 @@ import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.security.dtos.*;
 import com.delivery.app.security.exceptions.EmailAlreadyExistsException;
 import com.delivery.app.security.exceptions.UsernameAlreadyExistsDTO;
+import com.delivery.app.security.repository.UserAddressRepository;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.keycloak.admin.client.Keycloak;
@@ -21,10 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,11 +34,15 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
 
     @Value("${keycloak.realm}")
     private String realm;
-    private final Keycloak keycloak;
 
-    public KeycloakUserServiceImpl(Keycloak keycloak) {
+    private final Keycloak keycloak;
+    private final UserAddressRepository userAddressRepository;
+
+    public KeycloakUserServiceImpl(Keycloak keycloak, UserAddressRepository userAddressRepository) {
         this.keycloak = keycloak;
+        this.userAddressRepository = userAddressRepository;
     }
+
     @Override
     public UserDTO createUser(UserDTO userDTO) {
 
@@ -291,6 +293,30 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         }
         return users;
 
+    }
+
+    @Override
+    public List<UserAddressDTO> loadAddress(UUID keycloakUserId) {
+
+        return userAddressRepository.findByKeycloakUserId(keycloakUserId)
+                .stream().map(r -> UserAddressDTO.builder()
+                        .id(r.getId())
+                        .addressType(r.getAddressType())
+                        .details(r.getDetails())
+                        .companyName(r.getCompanyName())
+                        .street(r.getStreet())
+                        .address(r.getAddress())
+                        .latitude(r.getPosition().getY())
+                        .longitude(r.getPosition().getX())
+                        .indications(r.getIndications())
+                        .icon(switch (r.getAddressType()) {
+                            case HOME -> "assets/fd/home.svg";
+                            case DEPTO -> "assets/fd/office.svg";
+                            case OFFICE -> "assets/fd/depto.svg";
+                            case OTHER -> "assets/fd/other.svg";
+                        })
+                        .build()
+                ).toList();
     }
 
     private UsersResource getUsersResource() {

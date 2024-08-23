@@ -6,6 +6,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface KeycloakUserService {
     UserDTO createUser(UserDTO userDTO);
@@ -19,4 +20,6 @@ public interface KeycloakUserService {
     UserDTO findById(String id);
     List<UserRowDTO> searchList(UserReqFilterRowsDTO reqFilterRowsDTO);
     Page<UserRowDTO> search(UserReqFilterRowsDTO reqFilterRowsDTO, List<RoleDTO> roles);
+
+    List<UserAddressDTO> loadAddress(UUID keycloakUserId);
 }
