@@ -3,13 +3,6 @@ server:
   servlet:
     context-path: /
 
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        orm:
-#          jdbc:
-#            bind: trace
 
 spring:
   main:
@@ -65,20 +58,11 @@ jwt:
   auth:
     converter:
       resource-id: deliciasapp-auth-client
-#logging:
-#  level:
-#    org:
-#      hibernate: DEBUG
-#logging:
-#  level:
-#    org:
-#      springframework:
-#        security: TRACE undefined
 
 keycloak:
   use-resource-role-mappings: true
   realm: delicias-app
-  domain: 192.168.101.16:9001 # localhost:9001 #192.168.101.16:9001
+  domain: 192.168.101.10:9001 # localhost:9001 #192.168.101.16:9001
   adminClientId: admin-cli
   adminClientSecret: PP8mW3FCVO2vbC0dsiJFU6A8czcBokvx
   client: deliciasapp-auth-client
@@ -90,11 +74,16 @@ elasticsearch:
   apiKey: 'd1h5ZjI1QUJUX1pPSXB6M2RWdlY6UFRpaWpPN21RcVdWTmh5RmZKc1pnQQ=='
 
 delicias:
+  production: true
   timezone: -6 #America/Mexico_City
   files:
-    server: 'http://192.168.101.16:9095'
+    server: 'http://192.168.101.10:9095'
     resources: ${delicias.files.server}/resources
     staticDefault: ${delicias.files.server}/static/dl.png
     upload:
       path: '/home/jdev/delicias_cloud'
 
+google:
+  maps:
+    api:
+      key: AIzaSyBA46_7mzzYeQlV4u-6-763XESq9UDUEC8
