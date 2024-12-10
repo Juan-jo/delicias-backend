@@ -1,6 +1,7 @@
 package com.delivery.app.mobile.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
+import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.mobile.dtos.MobileGeocodingDTO;
 import com.delivery.app.mobile.dtos.MobileUserAddressDTO;
 import com.delivery.app.security.dtos.UserAddressDTO;
@@ -37,9 +38,9 @@ public class MobileUserService {
 
         List<UserAddress> addresses = userAddressRepository.findByKeycloakUserId(authenticationFacade.userId());
 
-        if(!addresses.isEmpty()) {
+        /*if(!addresses.isEmpty()) {
             return Set.of();
-        }
+        }*/
 
         if(deliciasAppProperties.getProduction()) {
             return Arrays.stream(googleMapsService.reverseGeocode(lat, lng)).map(
@@ -131,7 +132,24 @@ public class MobileUserService {
                         })
                 .build());
 
+        return modelToUserAddressDTO(userAddress);
+    }
 
+    @Transactional
+    public UserAddressDTO update(MobileUserAddressDTO dto) {
+
+        UserAddress userAddress = userAddressRepository.findById(dto.id())
+                .orElseThrow(() -> new ResourceNotFoundException("UserAddress", "id", dto.id()));
+
+        userAddress.update(dto);
+
+        userAddressRepository.save(userAddress);
+
+        return modelToUserAddressDTO(userAddress);
+    }
+
+
+    private UserAddressDTO modelToUserAddressDTO(UserAddress userAddress) {
         return UserAddressDTO.builder()
                 .id(userAddress.getId())
                 .addressType(userAddress.getAddressType())
