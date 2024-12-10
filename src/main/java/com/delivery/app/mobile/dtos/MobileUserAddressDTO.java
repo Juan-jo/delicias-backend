@@ -10,25 +10,25 @@ import lombok.Builder;
 @Builder
 public record MobileUserAddressDTO(
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnUpdate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnUpdate.class })
         Integer id,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class })
         UserAddressType addressType,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String street,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String address,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class})
         Double latitude,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class})
         Double longitude,
 
-        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class})
+        @NotNull(message = "The parameter is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String indications,
 
         String details,
