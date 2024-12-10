@@ -1,10 +1,10 @@
 package com.delivery.app.mobile.controller;
 
 import com.delivery.app.configs.validation.common.OnCreate;
+import com.delivery.app.configs.validation.common.OnUpdate;
 import com.delivery.app.mobile.dtos.MobileGeocodingDTO;
 import com.delivery.app.mobile.dtos.MobileUserAddressDTO;
 import com.delivery.app.mobile.service.MobileUserService;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
 import com.delivery.app.security.dtos.UserAddressDTO;
 import com.google.maps.errors.ApiException;
 import jakarta.validation.Valid;
@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -51,6 +50,17 @@ public class MobileUserController {
 
         return ResponseEntity.ok(
                 mobileUserService.addAddress(userAddressDTO)
+        );
+    }
+
+    @PutMapping("/update-address")
+    @Validated(OnUpdate.class)
+    public ResponseEntity<UserAddressDTO> updateAddress(
+            @Valid @RequestBody MobileUserAddressDTO userAddressDTO
+    ) {
+
+        return ResponseEntity.ok(
+                mobileUserService.update(userAddressDTO)
         );
     }
 
