@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneOffset;
+
 @Component
 @ConfigurationProperties(prefix = "delicias")
 @Getter
@@ -14,6 +16,10 @@ public class DeliciasAppProperties {
     private Boolean production;
     private Integer timezone;
     private CloudFiles files;
+
+    public ZoneOffset getZoneOffset() {
+        return ZoneOffset.ofHours(timezone);
+    }
 
     @Getter
     @Setter
