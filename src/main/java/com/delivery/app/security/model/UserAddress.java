@@ -1,8 +1,11 @@
 package com.delivery.app.security.model;
 
+import com.delivery.app.mobile.dtos.MobileUserAddressDTO;
 import com.delivery.app.security.enums.UserAddressType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 import java.util.UUID;
@@ -47,5 +50,27 @@ public class UserAddress {
     private String address;
 
     private String indications;
+
+    public void update(MobileUserAddressDTO userAddressDTO) {
+
+        this.addressType = userAddressDTO.addressType();
+        this.street = userAddressDTO.street();
+        this.address = userAddressDTO.address();
+        this.indications = userAddressDTO.indications();
+
+        GeometryFactory geometryFactory = new GeometryFactory();
+        this.position = geometryFactory.createPoint(
+                new Coordinate(userAddressDTO.longitude(), userAddressDTO.latitude()));
+
+        details = switch (addressType) {
+            case HOME, DEPTO, OTHER -> userAddressDTO.details();
+            case OFFICE -> "";
+        };
+
+        companyName = switch (addressType) {
+                    case HOME, DEPTO, OTHER -> "";
+                    case OFFICE -> userAddressDTO.companyName();
+        };
+    }
 
 }
