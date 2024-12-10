@@ -43,6 +43,7 @@ public class RestaurantTemplate extends AuditableEntity {
     @Column(name = "position", columnDefinition = "GEOGRAPHY(Point, 4326)")
     private Point position;
 
+    @Column(name = "address")
     private String address;
 
     @Column(name = "image_cover")
