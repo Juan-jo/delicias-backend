@@ -1,10 +1,14 @@
 package com.delivery.app.pos.restaurant_kanban.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
+import com.delicias.kafka.core.enums.STATUS_ORDER_DELIVERER;
 import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.pos.enums.KanbanStatus;
+import com.delivery.app.pos.enums.OrderStatus;
+import com.delivery.app.pos.order.models.PosOrder;
+import com.delivery.app.pos.order.repositories.PosOrderRepository;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.model.PosRestaurantKanban;
@@ -16,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +33,7 @@ public class PosRestaurantKanbanService {
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
     private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
     private final RestaurantTemplateRepository restaurantTemplateRepository;
+    private final PosOrderRepository posOrderRepository;
 
     @Transactional(readOnly = true)
     public PosRestaurantKanbanDTO loadKanban(Integer restaurantId) {
@@ -82,7 +88,7 @@ public class PosRestaurantKanbanService {
 
 
     @Transactional
-    public void updateKanbanItem(UpdatePosRestaurantKanbanDTO updatePosRestaurantKanbanDTO) {
+    public void updateStatusKanbanItem(UpdatePosRestaurantKanbanDTO updatePosRestaurantKanbanDTO) {
 
         PosRestaurantKanban restaurantKanban = posRestaurantKanbanRepository.findById(updatePosRestaurantKanbanDTO.id())
                 .orElseThrow();
@@ -91,27 +97,49 @@ public class PosRestaurantKanbanService {
 
         restaurantKanban.setStatus(updatePosRestaurantKanbanDTO.status());
 
-        if(updatePosRestaurantKanbanDTO.status().equals(KanbanStatus.READY_TO_DELIVER)) {
+        switch (updatePosRestaurantKanbanDTO.status()) {
+            case ACCEPTED -> OrderAccepted(restaurantKanban.getOrder().getId());
+            case COOKING -> OrderCooking(restaurantKanban.getOrder().getId());
+            case READY_TO_DELIVER -> {
+                searchDelivery(
+                        orderId,
+                        restaurantKanban.getRestaurantTmpl(),
+                        restaurantKanban.getOrder()
+                );
 
-            double longitude = restaurantKanban.getRestaurantTmpl().getPosition().getCoordinate().getX();
-            double latitude = restaurantKanban.getRestaurantTmpl().getPosition().getCoordinate().getY();
-
-            searchDelivery(orderId, longitude, latitude);
+                OrderReadyToDeliver(restaurantKanban.getOrder().getId());
+            }
+            case DELIVERED_TO_DELIVER -> OrderDeliveryRoadToDestination(restaurantKanban.getOrder().getId());
+            case CANCELLED -> OrderCancelled(restaurantKanban.getOrder().getId());
         }
+
 
     }
 
     @Async
-    void searchDelivery(Integer orderId, double longitude, double latitude) {
+    void searchDelivery(
+            Integer orderId,
+            RestaurantTemplate restaurantTmpl,
+            PosOrder order
+            ) {
+
+        DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+
+        double longitude = restaurantTmpl.getPosition().getCoordinate().getX();
+        double latitude = restaurantTmpl.getPosition().getCoordinate().getY();
 
         KafkaTopicOrderDTO.Restaurant restaurant = new KafkaTopicOrderDTO.Restaurant();
         restaurant.setLatitude(latitude);
         restaurant.setLongitude(longitude);
+        restaurant.setName(restaurantTmpl.getName());
+        restaurant.setAddress(restaurantTmpl.getAddress());
 
         KafkaTopicOrderDTO topicOrderDTO = new KafkaTopicOrderDTO();
         topicOrderDTO.setAction(TOPIC_ORDER_ACTION.SEARCH_DELIVERY);
         topicOrderDTO.setRestaurant(restaurant);
-        topicOrderDTO.setId(orderId);
+        topicOrderDTO.setOrderId(orderId);
+        topicOrderDTO.setStatus(STATUS_ORDER_DELIVERER.ASSIGNED);
+        topicOrderDTO.setHour(order.getCreatedAt().format(CUSTOM_FORMATTER));
 
         kafkaTopicOrderProducer.sendMessageTopicOrder(topicOrderDTO);
     }
@@ -140,4 +168,51 @@ public class PosRestaurantKanbanService {
 
 
     }
+
+    private void OrderAccepted(Integer orderId) {
+
+        PosOrder order = posOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("order", "id", orderId));
+
+        order.setStatus(OrderStatus.ACCEPTED);
+
+        posOrderRepository.save(order);
+    }
+
+    private void OrderCooking(Integer orderId) {
+
+        PosOrder order = posOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("order", "id", orderId));
+
+        order.setStatus(OrderStatus.COOKING);
+
+        posOrderRepository.save(order);
+    }
+
+    private void OrderReadyToDeliver(Integer orderId) {
+
+        PosOrder order = posOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("order", "id", orderId));
+
+        order.setStatus(OrderStatus.READY);
+
+        posOrderRepository.save(order);
+
+    }
+
+    private void OrderDeliveryRoadToDestination(Integer orderId) {
+
+        PosOrder order = posOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("order", "id", orderId));
+
+
+        order.setStatus(OrderStatus.DELIVERY_ROAD_TO_DESTINATION);
+
+        posOrderRepository.save(order);
+    }
+
+    private void OrderCancelled(Integer orderId) {
+        // TODO Falta implementar
+    }
+
 }

@@ -52,7 +52,7 @@ public class PosRestaurantKanbanController {
             @Valid @RequestBody UpdatePosRestaurantKanbanDTO updatePosRestaurantKanbanDTO
             ) {
 
-        posRestaurantKanbanService.updateKanbanItem(updatePosRestaurantKanbanDTO);
+        posRestaurantKanbanService.updateStatusKanbanItem(updatePosRestaurantKanbanDTO);
         return ResponseEntity.noContent().build();
     }
 
