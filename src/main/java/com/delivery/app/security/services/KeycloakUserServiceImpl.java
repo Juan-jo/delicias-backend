@@ -311,8 +311,8 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
                         .indications(r.getIndications())
                         .icon(switch (r.getAddressType()) {
                             case HOME -> "assets/fd/home.svg";
-                            case DEPTO -> "assets/fd/office.svg";
-                            case OFFICE -> "assets/fd/depto.svg";
+                            case DEPTO -> "assets/fd/depto.svg";
+                            case OFFICE -> "assets/fd/office.svg";
                             case OTHER -> "assets/fd/other.svg";
                         })
                         .build()
