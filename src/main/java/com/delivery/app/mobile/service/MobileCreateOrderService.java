@@ -1,6 +1,7 @@
 package com.delivery.app.mobile.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicKanbanDTO;
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicKanbanProducer;
 import com.delivery.app.mobile.dtos.MobileCreateOrderDTO;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +44,7 @@ public class MobileCreateOrderService {
     private final PosOrderLineProductAttributeValueRelRepository posOrderLineProductAttributeValueRelRepository;
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
     private final KafkaTopicKanbanProducer kafkaProducer;
+    private final DeliciasAppProperties deliciasAppProperties;
 
     private static final double costService = 35.00;
 
@@ -85,11 +88,10 @@ public class MobileCreateOrderService {
 
         validateAmounts(createOrderDTO, subtotal);
 
-        PosRestaurantKanban kanban = addRestaurantKanban(newOrder);
+        PosRestaurantKanban kanban = createKanban(newOrder);
 
         KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
         kafkaTopicKanbanDTO.setRestaurantId(createOrderDTO.restaurantId());
-        kafkaTopicKanbanDTO.setAction("ADD_KANBAN");
         kafkaTopicKanbanDTO.setId(kanban.getId());
 
         kafkaProducer.sendMessageTopicKanban(
@@ -106,6 +108,9 @@ public class MobileCreateOrderService {
 
 
     private PosOrder generateNewPosOrder(MobileCreateOrderDTO createOrderDTO, UUID userId) {
+
+        LocalDate today = ZonedDateTime.now(deliciasAppProperties.getZoneOffset()).toLocalDate();
+
         return posOrderRepository.save(
                 PosOrder.builder()
                         .status(OrderStatus.ORDERED)
@@ -115,7 +120,7 @@ public class MobileCreateOrderService {
                         .amountDiscount(amount2f(createOrderDTO.discount()))
                         .userUID(userId)
                         .userId(userId)
-                        .dateOrder(LocalDate.now())
+                        .dateOrder(today)
                         .restaurantTmpl(new RestaurantTemplate(createOrderDTO.restaurantId()))
                         .notes(createOrderDTO.notes())
                         .build()
@@ -152,7 +157,7 @@ public class MobileCreateOrderService {
     }
 
 
-    private PosRestaurantKanban  addRestaurantKanban(PosOrder posOrder) {
+    private PosRestaurantKanban createKanban(PosOrder posOrder) {
          return posRestaurantKanbanRepository.save(
                 PosRestaurantKanban.builder()
                         .status(KanbanStatus.RECEIVED)
