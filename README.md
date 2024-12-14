@@ -135,3 +135,37 @@ convert suizas_comida.png -quality 20 1723236657811_12.jpg
 ```
 magick input.jpg -resize 800x600 output.jpg
 ```
+
+
+### FireStore payload ejemplo de Orden
+```json
+{
+    "orderId": 1,
+    "keycloakUserId": "173ed7d0-d5c0-4d5d-a19b-545ab3c0e65c",
+    "deliveryUserId": "173ed7d0-d5c0-4d5d-a19b-545ab3c0e75c",
+    "orderStatus": "READY",
+    "products": [
+    {
+      "name": "Sándwich de Pavo y Panela",
+      "qty": 1
+    }],     
+    "restaurant": {
+      "name": "Starbucks Coffe",
+      "picture": "http://192.168.101.4:9095/resources/1723664467276__LOGO_15.png",
+      "address": "colonia centro, calle 3",
+      "point": {
+        "lat": 0,
+        "lon": 0
+      }
+    },
+    "user": {
+      "name": "Juan José",
+      "picture": "http://192.168.101.4:9095/resources/1723664467276__LOGO_15.png",
+      "address": "colonia papalotes, calle #333",
+      "point": {
+        "lat": 0,
+        "lon": 0
+      }
+    }
+}
+```

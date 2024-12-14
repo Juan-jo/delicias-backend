@@ -1,9 +1,12 @@
 package com.delivery.app.mobile.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicKanbanDTO;
+import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
+import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicKanbanProducer;
+import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.mobile.dtos.MobileCreateOrderDTO;
 import com.delivery.app.mobile.exception.MobileOrderDifferentSubtotalAmount;
 import com.delivery.app.mobile.exception.MobileOrderDifferentTotalAmount;
@@ -21,16 +24,18 @@ import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.template.models.ProductTemplate;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
+import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import com.delivery.app.security.services.AuthenticationFacade;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -43,8 +48,10 @@ public class MobileCreateOrderService {
     private final PosOrderLineRepository posOrderLineRepository;
     private final PosOrderLineProductAttributeValueRelRepository posOrderLineProductAttributeValueRelRepository;
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
-    private final KafkaTopicKanbanProducer kafkaProducer;
+    private final KafkaTopicKanbanProducer kafkaTopicKanbanProducer;
+    private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
     private final DeliciasAppProperties deliciasAppProperties;
+    private final RestaurantTemplateRepository restaurantTemplateRepository;
 
     private static final double costService = 35.00;
 
@@ -55,9 +62,11 @@ public class MobileCreateOrderService {
 
         UUID userId = authenticationFacade.userId();
 
-        PosOrder newOrder = generateNewPosOrder(createOrderDTO, userId);
+        PosOrder newOrder = createPosOrder(createOrderDTO, userId);
 
         double subtotal = 0.0;
+
+        List<ProductOrder> products = new ArrayList<>();
 
         for(MobileCreateOrderDTO.ProductTmpl productTmpl: createOrderDTO.productTmpl()) {
 
@@ -84,30 +93,29 @@ public class MobileCreateOrderService {
 
 
             saveProductLine(newOrder, productTmpl, currentTmpl.getListPrice(), subtotal, productAtrValues);
+
+            products.add(new ProductOrder(currentTmpl.getName(), productTmpl.qty()));
         }
 
         validateAmounts(createOrderDTO, subtotal);
 
         PosRestaurantKanban kanban = createKanban(newOrder);
 
-        KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
-        kafkaTopicKanbanDTO.setRestaurantId(createOrderDTO.restaurantId());
-        kafkaTopicKanbanDTO.setId(kanban.getId());
+        RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(createOrderDTO.restaurantId())
+                .orElseThrow(() -> new ResourceNotFoundException("restaurant", "id", createOrderDTO.restaurantId()));
 
-        kafkaProducer.sendMessageTopicKanban(
-                kafkaTopicKanbanDTO
-        );
+        // Send Kafka Messages
+        sendMessageKafkaTopicKanban(createOrderDTO, kanban);
+        sendMessageKafkaTopicOrder(
+                newOrder.getId(),
+                newOrder.getStatus().name(),
+                userId,
+                restaurantTemplate,
+                products);
 
-
-        /*kafkaProducer.sendMessageTodo(
-                KafkaTodoDTO.builder()
-                        .name("Juan")
-                        .build()
-        );*/
     }
 
-
-    private PosOrder generateNewPosOrder(MobileCreateOrderDTO createOrderDTO, UUID userId) {
+    private PosOrder createPosOrder(MobileCreateOrderDTO createOrderDTO, UUID userId) {
 
         LocalDate today = ZonedDateTime.now(deliciasAppProperties.getZoneOffset()).toLocalDate();
 
@@ -156,7 +164,6 @@ public class MobileCreateOrderService {
         );
     }
 
-
     private PosRestaurantKanban createKanban(PosOrder posOrder) {
          return posRestaurantKanbanRepository.save(
                 PosRestaurantKanban.builder()
@@ -168,6 +175,7 @@ public class MobileCreateOrderService {
 
 
     }
+
     private List<ProductTemplate> getProductTemplatesFromDatabase(MobileCreateOrderDTO createOrderDTO) {
         return productTemplateRepository.findByIdIn(
                 createOrderDTO.productTmpl().stream()
@@ -176,6 +184,66 @@ public class MobileCreateOrderService {
         );
     }
 
+    private void sendMessageKafkaTopicOrder(
+            Integer orderId,
+            String status,
+            UUID userId,
+            RestaurantTemplate restaurantTmpl,
+            List<ProductOrder> orderLines
+    ) {
+
+        List<KafkaTopicOrderDTO.OrderLine> products = orderLines.stream()
+                .map(line -> new KafkaTopicOrderDTO.OrderLine(line.qty, line.name)).toList();
+
+        KafkaTopicOrderDTO.OrderRestaurant restaurant = new KafkaTopicOrderDTO.OrderRestaurant(
+                restaurantTmpl.getName(),
+                restaurantTmpl.getAddress(),
+                Optional.ofNullable(restaurantTmpl.getImageLogo())
+                        .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
+                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()),
+                new KafkaTopicOrderDTO.GpsPoint(
+                        restaurantTmpl.getPosition().getCoordinate().getY(),
+                        restaurantTmpl.getPosition().getCoordinate().getX())
+        );
+
+        //TODO Falta obtener usuario
+        KafkaTopicOrderDTO.OrderUser user = new KafkaTopicOrderDTO.OrderUser(
+                "Juan Jośe",
+                "Zocuiteco Benito Juarez, Mexico",
+                "https://images.freeimages.com/365/images/previews/85b/psd-universal-blue-web-user-icon-53242.jpg",
+                new KafkaTopicOrderDTO.GpsPoint(0d, 0d)
+        );
+
+
+        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
+        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.USER_ORDER_CREATED);
+        kafkaTopicOrderDTO.setOrder(
+                new KafkaTopicOrderDTO.Order(
+                        orderId,
+                        userId.toString(),
+                        status,
+                        new Date(),
+                        products,
+                        restaurant,
+                        user
+                )
+        );
+
+        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
+    }
+
+    private void sendMessageKafkaTopicKanban(
+            MobileCreateOrderDTO createOrderDTO,
+            PosRestaurantKanban kanban
+    ) {
+        KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
+        kafkaTopicKanbanDTO.setRestaurantId(createOrderDTO.restaurantId());
+        kafkaTopicKanbanDTO.setId(kanban.getId());
+
+        kafkaTopicKanbanProducer.sendMessageTopicKanban(
+                kafkaTopicKanbanDTO
+        );
+    }
 
 
     private void validateAmounts(MobileCreateOrderDTO createOrderDTO, double subtotal) {
@@ -202,5 +270,10 @@ public class MobileCreateOrderService {
     private record ProductAttrValue(
             Integer id,
             Double extraPrice
+    ) { }
+
+    private record ProductOrder(
+            String name,
+            Integer qty
     ) { }
 }

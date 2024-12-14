@@ -123,6 +123,7 @@ public class PosRestaurantKanbanService {
             PosOrder order
             ) {
 
+        /*
         DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
         double longitude = restaurantTmpl.getPosition().getCoordinate().getX();
@@ -141,7 +142,7 @@ public class PosRestaurantKanbanService {
         topicOrderDTO.setStatus(STATUS_ORDER_DELIVERER.ASSIGNED);
         topicOrderDTO.setHour(order.getCreatedAt().format(CUSTOM_FORMATTER));
 
-        kafkaTopicOrderProducer.sendMessageTopicOrder(topicOrderDTO);
+        kafkaTopicOrderProducer.sendMessageTopicOrder(topicOrderDTO);*/
     }
 
     public PosRestaurantKanbanDTO.Order findKanban(Integer id) {
@@ -177,6 +178,8 @@ public class PosRestaurantKanbanService {
         order.setStatus(OrderStatus.ACCEPTED);
 
         posOrderRepository.save(order);
+
+        sendMessageKafkaTopicOrder(orderId, OrderStatus.ACCEPTED.name());
     }
 
     private void OrderCooking(Integer orderId) {
@@ -187,6 +190,7 @@ public class PosRestaurantKanbanService {
         order.setStatus(OrderStatus.COOKING);
 
         posOrderRepository.save(order);
+        sendMessageKafkaTopicOrder(orderId, OrderStatus.COOKING.name());
     }
 
     private void OrderReadyToDeliver(Integer orderId) {
@@ -197,6 +201,7 @@ public class PosRestaurantKanbanService {
         order.setStatus(OrderStatus.READY);
 
         posOrderRepository.save(order);
+        sendMessageKafkaTopicOrder(orderId, OrderStatus.READY.name());
 
     }
 
@@ -209,10 +214,34 @@ public class PosRestaurantKanbanService {
         order.setStatus(OrderStatus.DELIVERY_ROAD_TO_DESTINATION);
 
         posOrderRepository.save(order);
+        sendMessageKafkaTopicOrder(orderId, OrderStatus.DELIVERY_ROAD_TO_DESTINATION.name());
     }
 
     private void OrderCancelled(Integer orderId) {
         // TODO Falta implementar
     }
 
+
+    private void sendMessageKafkaTopicOrder(Integer orderId, String status) {
+
+        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order();
+        order.setOrderId(orderId);
+        order.setOrderStatus(status);
+
+        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
+        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
+        kafkaTopicOrderDTO.setOrder(order);
+
+        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
+
+        /*KafkaTopicOrderDTO.OrderDetail orderDetail = new KafkaTopicOrderDTO.OrderDetail();
+        orderDetail.setStatus(status);
+
+        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
+        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
+        kafkaTopicOrderDTO.setOrderId(orderId);
+        kafkaTopicOrderDTO.setOrderDetail(orderDetail);
+
+        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);*/
+    }
 }
