@@ -1,7 +1,6 @@
 package com.delivery.app.pos.restaurant_kanban.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
-import com.delicias.kafka.core.enums.STATUS_ORDER_DELIVERER;
 import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
@@ -20,7 +19,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -101,13 +99,13 @@ public class PosRestaurantKanbanService {
             case ACCEPTED -> OrderAccepted(restaurantKanban.getOrder().getId());
             case COOKING -> OrderCooking(restaurantKanban.getOrder().getId());
             case READY_TO_DELIVER -> {
-                searchDelivery(
-                        orderId,
-                        restaurantKanban.getRestaurantTmpl(),
-                        restaurantKanban.getOrder()
-                );
 
                 OrderReadyToDeliver(restaurantKanban.getOrder().getId());
+
+                sendMessageTopicOrderForSearchDelivery(
+                        orderId,
+                        restaurantKanban.getRestaurantTmpl()
+                );
             }
             case DELIVERED_TO_DELIVER -> OrderDeliveryRoadToDestination(restaurantKanban.getOrder().getId());
             case CANCELLED -> OrderCancelled(restaurantKanban.getOrder().getId());
@@ -116,34 +114,7 @@ public class PosRestaurantKanbanService {
 
     }
 
-    @Async
-    void searchDelivery(
-            Integer orderId,
-            RestaurantTemplate restaurantTmpl,
-            PosOrder order
-            ) {
 
-        /*
-        DateTimeFormatter CUSTOM_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
-        double longitude = restaurantTmpl.getPosition().getCoordinate().getX();
-        double latitude = restaurantTmpl.getPosition().getCoordinate().getY();
-
-        KafkaTopicOrderDTO.Restaurant restaurant = new KafkaTopicOrderDTO.Restaurant();
-        restaurant.setLatitude(latitude);
-        restaurant.setLongitude(longitude);
-        restaurant.setName(restaurantTmpl.getName());
-        restaurant.setAddress(restaurantTmpl.getAddress());
-
-        KafkaTopicOrderDTO topicOrderDTO = new KafkaTopicOrderDTO();
-        topicOrderDTO.setAction(TOPIC_ORDER_ACTION.SEARCH_DELIVERY);
-        topicOrderDTO.setRestaurant(restaurant);
-        topicOrderDTO.setOrderId(orderId);
-        topicOrderDTO.setStatus(STATUS_ORDER_DELIVERER.ASSIGNED);
-        topicOrderDTO.setHour(order.getCreatedAt().format(CUSTOM_FORMATTER));
-
-        kafkaTopicOrderProducer.sendMessageTopicOrder(topicOrderDTO);*/
-    }
 
     public PosRestaurantKanbanDTO.Order findKanban(Integer id) {
 
@@ -224,24 +195,39 @@ public class PosRestaurantKanbanService {
 
     private void sendMessageKafkaTopicOrder(Integer orderId, String status) {
 
-        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order();
-        order.setOrderId(orderId);
-        order.setOrderStatus(status);
+        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order(
+                orderId,
+                status
+        );
 
         KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
         kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
         kafkaTopicOrderDTO.setOrder(order);
 
         kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
+    }
 
-        /*KafkaTopicOrderDTO.OrderDetail orderDetail = new KafkaTopicOrderDTO.OrderDetail();
-        orderDetail.setStatus(status);
+    @Async
+    void sendMessageTopicOrderForSearchDelivery(
+            Integer orderId,
+            RestaurantTemplate restaurantTmpl
+    ) {
+
+        KafkaTopicOrderDTO.OrderRestaurant restaurant = new KafkaTopicOrderDTO.OrderRestaurant(
+                new KafkaTopicOrderDTO.GpsPoint(
+                        restaurantTmpl.getPosition().getCoordinate().getY(),
+                        restaurantTmpl.getPosition().getCoordinate().getX())
+        );
+
+        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order(
+                orderId,
+                restaurant
+        );
 
         KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
-        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
-        kafkaTopicOrderDTO.setOrderId(orderId);
-        kafkaTopicOrderDTO.setOrderDetail(orderDetail);
+        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.SEARCH_DELIVERY);
+        kafkaTopicOrderDTO.setOrder(order);
 
-        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);*/
+        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
     }
 }
