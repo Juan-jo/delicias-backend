@@ -60,6 +60,7 @@ public class PosOrder extends AuditableEntity {
     @Column(name = "date_order")
     private LocalDate dateOrder;
 
+    @OrderBy("id asc")
     @OneToMany(mappedBy = "order")
     private Set<PosOrderLine> lines;
 
@@ -70,4 +71,6 @@ public class PosOrder extends AuditableEntity {
         return this.createdAt;
     }
 
+    @Column(name = "delivery_order_rel_id")
+    private Integer deliveryOrderRelId;
 }
