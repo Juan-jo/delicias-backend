@@ -1379,3 +1379,46 @@ databaseChangeLog:
                      name: name
               schemaName: public
               tableName: user_addresses
+  - changeSet:
+      id: 27032024_43
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: delivery_order_rel_id
+                  type: INTEGER
+                  remarks: Set value when the delivery person is assigned
+
+  - changeSet:
+      id: 27032024_44
+      author: jdev
+      changes:
+        - sql:
+            endDelimiter: \nGO
+            splitStatements: true
+            sql: >-
+              CREATE OR REPLACE FUNCTION update_orders_trigger_function()
+              RETURNS TRIGGER AS $$
+              BEGIN
+                UPDATE pos_order
+                SET   delivery_order_rel_id = NEW.id,
+                      delivery_uid = NEW.deliverer_id
+                WHERE id = NEW.order_id;
+                RETURN NEW;
+              END; $$ LANGUAGE plpgsql;
+
+  - changeSet:
+      id: 27032024_45
+      author: jdev
+      changes:
+        - sql:
+            endDelimiter: \nGO
+            splitStatements: true
+            sql: >-
+              CREATE OR REPLACE TRIGGER update_orders_trigger
+              AFTER INSERT
+              ON delivery_order_rel
+              FOR EACH ROW
+              EXECUTE FUNCTION update_orders_trigger_function();

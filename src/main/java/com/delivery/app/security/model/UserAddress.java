@@ -1,6 +1,6 @@
 package com.delivery.app.security.model;
 
-import com.delivery.app.mobile.dtos.MobileUserAddressDTO;
+import com.delivery.app.mobile.user.dtos.MobileUserAddressDTO;
 import com.delivery.app.security.enums.UserAddressType;
 import jakarta.persistence.*;
 import lombok.*;
