@@ -27,15 +27,12 @@ import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import com.delivery.app.security.services.AuthenticationFacade;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -238,7 +235,7 @@ public class MobileCreateOrderService {
     ) {
         KafkaTopicKanbanDTO kafkaTopicKanbanDTO = new KafkaTopicKanbanDTO();
         kafkaTopicKanbanDTO.setRestaurantId(createOrderDTO.restaurantId());
-        kafkaTopicKanbanDTO.setId(kanban.getId());
+        kafkaTopicKanbanDTO.setKanbanId(kanban.getId());
 
         kafkaTopicKanbanProducer.sendMessageTopicKanban(
                 kafkaTopicKanbanDTO
