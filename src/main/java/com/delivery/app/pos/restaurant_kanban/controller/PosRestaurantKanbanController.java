@@ -2,6 +2,7 @@ package com.delivery.app.pos.restaurant_kanban.controller;
 
 import com.delivery.app.configs.constants.RoleType;
 import com.delivery.app.configs.validation.common.OnUpdate;
+import com.delivery.app.pos.restaurant_kanban.dtos.PosKanbanOrderDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.service.PosRestaurantKanbanService;
@@ -63,6 +64,16 @@ public class PosRestaurantKanbanController {
 
         return ResponseEntity.ok(
                 posRestaurantKanbanService.findKanban(id)
+        );
+    }
+
+    @GetMapping("/{kanbanId}/order")
+    public ResponseEntity<PosKanbanOrderDTO> order(
+            @NotNull @PathVariable Integer kanbanId
+    ) {
+
+        return ResponseEntity.ok(
+                posRestaurantKanbanService.findOrderByKanbanId(kanbanId)
         );
     }
 

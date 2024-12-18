@@ -2,18 +2,22 @@ package com.delivery.app.pos.restaurant_kanban.service;
 
 import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
 import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
+import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.pos.enums.KanbanStatus;
 import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.pos.order.models.PosOrder;
 import com.delivery.app.pos.order.repositories.PosOrderRepository;
+import com.delivery.app.pos.restaurant_kanban.dtos.PosKanbanOrderDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.restaurant_kanban.repository.PosRestaurantKanbanRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
+import com.delivery.app.security.dtos.UserDTO;
+import com.delivery.app.security.services.KeycloakUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,9 @@ public class PosRestaurantKanbanService {
     private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
     private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final PosOrderRepository posOrderRepository;
+    private final KeycloakUserService keycloakUserService;
+    private final DeliciasAppProperties deliciasAppProperties;
+
 
     @Transactional(readOnly = true)
     public PosRestaurantKanbanDTO loadKanban(Integer restaurantId) {
@@ -89,7 +96,7 @@ public class PosRestaurantKanbanService {
     public void updateStatusKanbanItem(UpdatePosRestaurantKanbanDTO updatePosRestaurantKanbanDTO) {
 
         PosRestaurantKanban restaurantKanban = posRestaurantKanbanRepository.findById(updatePosRestaurantKanbanDTO.id())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("kanban", "id", updatePosRestaurantKanbanDTO.id()));
 
         Integer orderId = restaurantKanban.getOrder().getId();
 
@@ -137,8 +144,58 @@ public class PosRestaurantKanbanService {
         ).orElseThrow(
                 () -> new ResourceNotFoundException("load kanban", "id", id)
         );
+    }
+
+    public PosKanbanOrderDTO findOrderByKanbanId(Integer kanbanId) {
+
+        PosRestaurantKanban kanban = posRestaurantKanbanRepository.findById(kanbanId)
+                .orElseThrow(() -> new ResourceNotFoundException("kanban", "id", kanbanId));
 
 
+        UserDTO deliverer = null;
+
+        if(kanban.getOrder().getDeliveryUserUID() != null) {
+            deliverer = keycloakUserService.findById(kanban.getOrder().getDeliveryUserUID().toString());
+        }
+
+
+
+        return PosKanbanOrderDTO.builder()
+                .kanbanId(kanban.getId())
+                .order(PosKanbanOrderDTO.Order.builder()
+                        .orderId(kanban.getOrder().getId())
+                        .hasNote(Optional.ofNullable(kanban.getOrder().getNotes())
+                                .map(r-> !r.trim().isEmpty())
+                                .orElse(false))
+                        .notes(kanban.getOrder().getNotes())
+                        .dateOrdered(kanban.getOrder().getCreatedAt())
+                        .amountTotal(kanban.getOrder().getAmountTotal())
+                        .status(kanban.getOrder().getStatus())
+                        .deliverer(Optional.ofNullable(deliverer)
+                                .map(d -> PosKanbanOrderDTO.Order.OrderDeliverer.builder()
+                                        .name(d.firstName())
+                                        .picture(deliciasAppProperties.getFiles().getStaticDefault())
+                                .build())
+                                .orElse(null))
+                        .lines(kanban.getOrder().getLines().stream()
+                                .map(l -> PosKanbanOrderDTO.OrderLine.builder()
+                                        .qty(l.getQuantity())
+                                        .name(l.getProductTemplate().getName())
+                                        .picture(
+                                                Optional.ofNullable(l.getProductTemplate().getPicture())
+                                                        .map(picture -> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), picture))
+                                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()
+                                                )
+                                        )
+                                        .attrValues(l.getAttributeValues().stream().map(
+                                                av -> PosKanbanOrderDTO.OrderLine.AttrValue.builder()
+                                                        .attrName(av.getAttributeValue().getAttribute().getName())
+                                                        .attrValueName(av.getAttributeValue().getName())
+                                                        .build()).toList())
+                                                .build())
+                                        .toList())
+                                .build())
+                .build();
     }
 
     private void OrderAccepted(Integer orderId) {
