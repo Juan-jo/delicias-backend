@@ -7,6 +7,7 @@ import com.delivery.app.mobile.service.MobileDeliveryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,15 @@ public class MobileDeliveryController {
         );
     }
 
+    @Async
     @PutMapping("/pgs/tracking")
     @Validated(OnUpdate.class)
     public ResponseEntity<?> updateLastPosition(
             @Valid @RequestBody DeliveryOrderLastPosition orderLastPosition
     ) {
 
+
+        mobileDeliveryService.updateGpsTracking(orderLastPosition);
 
 
         return ResponseEntity.noContent().build();
