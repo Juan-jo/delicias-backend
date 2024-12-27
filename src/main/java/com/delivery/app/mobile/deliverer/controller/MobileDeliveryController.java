@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @CrossOrigin(originPatterns = {"*"})
 @RestController
 @RequestMapping("/api/v1/mobile/r/order")
@@ -30,6 +32,18 @@ public class MobileDeliveryController {
         );
     }
 
+    @GetMapping("/{orderId}/start")
+    public ResponseEntity<Map<String, Object>> roadToStore(
+            @Valid @PathVariable Integer orderId
+    ) {
+
+        mobileDeliveryService.roadToStore(orderId);
+
+        return ResponseEntity.ok(
+             Map.of("success", true)
+        );
+    }
+
     @Async
     @PutMapping("/pgs/tracking")
     @Validated(OnUpdate.class)
@@ -38,17 +52,6 @@ public class MobileDeliveryController {
     ) {
 
         mobileDeliveryService.updateGpsTracking(orderLastPosition);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{orderId}/start")
-    @Validated(OnUpdate.class)
-    public ResponseEntity<?> start(
-            @Valid @PathVariable Integer orderId
-    ) {
-
-        mobileDeliveryService.roadToStore(orderId);
 
         return ResponseEntity.noContent().build();
     }

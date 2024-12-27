@@ -12,6 +12,7 @@ import com.delivery.app.pos.order.repositories.PosOrderRepository;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosKanbanOrderDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.restaurant_kanban.dtos.UpdatePosRestaurantKanbanDTO;
+import com.delivery.app.pos.order.exception.InvalidProcessStatusOrder;
 import com.delivery.app.pos.restaurant_kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.restaurant_kanban.repository.PosRestaurantKanbanRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
@@ -114,7 +115,18 @@ public class PosRestaurantKanbanService {
                         restaurantKanban.getRestaurantTmpl()
                 );
             }
-            case DELIVERED_TO_DELIVER -> OrderDeliveryRoadToDestination(restaurantKanban.getOrder().getId());
+            case DELIVERED_TO_DELIVER -> { // when deliverer receive order
+
+                OrderStatus orderStatus = restaurantKanban.getOrder().getStatus();
+
+                if(orderStatus.equals(OrderStatus.DELIVERY_ROAD_TO_STORE)) {
+                    OrderDeliveryRoadToDestination(restaurantKanban.getOrder().getId());
+                }
+                else {
+                    throw new InvalidProcessStatusOrder(orderId, orderStatus.name(), OrderStatus.DELIVERY_ROAD_TO_DESTINATION.name());
+                }
+
+            }
             case CANCELLED -> OrderCancelled(restaurantKanban.getOrder().getId());
         }
 
@@ -246,7 +258,7 @@ public class PosRestaurantKanbanService {
     }
 
     private void OrderCancelled(Integer orderId) {
-        // TODO Falta implementar
+        //TODO Falta implementar
     }
 
 

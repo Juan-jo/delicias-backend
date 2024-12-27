@@ -114,6 +114,7 @@ public class MobileUserCreateOrderService {
 
     private PosOrder createPosOrder(MobileUserCreateOrderDTO createOrderDTO, UUID userId) {
 
+        //TODO Falta obtener direcccion de usuario
         LocalDate today = ZonedDateTime.now(deliciasAppProperties.getZoneOffset()).toLocalDate();
 
         return posOrderRepository.save(
