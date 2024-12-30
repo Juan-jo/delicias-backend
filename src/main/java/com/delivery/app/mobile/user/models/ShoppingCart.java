@@ -5,6 +5,7 @@ import com.delivery.app.security.model.UserAddress;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -30,4 +31,8 @@ public class ShoppingCart {
     @ManyToOne
     @JoinColumn(name = "user_address_id", referencedColumnName = "id")
     private UserAddress userAddress;
+
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "shoppingCart")
+    private Set<ShoppingCartLine> lines;
 }
