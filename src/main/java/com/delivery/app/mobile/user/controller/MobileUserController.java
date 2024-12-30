@@ -2,8 +2,8 @@ package com.delivery.app.mobile.user.controller;
 
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnUpdate;
-import com.delivery.app.mobile.user.dtos.MobileUserNearbyGeocodingDTO;
 import com.delivery.app.mobile.user.dtos.MobileUserAddressDTO;
+import com.delivery.app.mobile.user.dtos.MobileUserNearbyGeocodingDTO;
 import com.delivery.app.mobile.user.service.MobileUserService;
 import com.delivery.app.security.dtos.UserAddressDTO;
 import com.google.maps.errors.ApiException;
@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -64,4 +65,11 @@ public class MobileUserController {
         );
     }
 
+    @GetMapping("/address/last")
+    public ResponseEntity<Map<String, Object>> lastUserAddress(){
+
+        return ResponseEntity.ok(
+                mobileUserService.lastUserAddress()
+        );
+    }
 }

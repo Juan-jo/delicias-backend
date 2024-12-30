@@ -2,8 +2,8 @@ package com.delivery.app.mobile.user.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.mobile.user.dtos.MobileUserNearbyGeocodingDTO;
 import com.delivery.app.mobile.user.dtos.MobileUserAddressDTO;
+import com.delivery.app.mobile.user.dtos.MobileUserNearbyGeocodingDTO;
 import com.delivery.app.security.dtos.UserAddressDTO;
 import com.delivery.app.security.model.UserAddress;
 import com.delivery.app.security.repository.UserAddressRepository;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class MobileUserService {
         List<UserAddress> addresses = userAddressRepository.findByKeycloakUserId(authenticationFacade.userId());
 
         if(!addresses.isEmpty()) {
-            return Set.of();
+            //return Set.of();
         }
 
         if(deliciasAppProperties.getProduction()) {
@@ -146,6 +147,27 @@ public class MobileUserService {
         userAddressRepository.save(userAddress);
 
         return modelToUserAddressDTO(userAddress);
+    }
+
+    public Map<String, Object> lastUserAddress() {
+
+        Integer lastUserAddressId = authenticationFacade.lastUserAddressId();
+
+        Map<String, Object> response = Map.of("exists", false);
+
+        if(lastUserAddressId != null) {
+
+            UserAddress address = userAddressRepository.findById(lastUserAddressId)
+                    .orElse(null);
+
+            if(address != null) {
+                response = Map.of("exists", true, "data", modelToUserAddressDTO(address));
+            }
+
+        }
+
+        return response;
+
     }
 
 

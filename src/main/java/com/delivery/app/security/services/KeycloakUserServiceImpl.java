@@ -32,6 +32,8 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     private static final String ATTR_STORE = "store";
     private static final String ROLE_STORE = "ROLE_STORE";
 
+    static final String ATTR_LAST_USER_ADDRESS_ID  = "lastUserAddressId";
+
     @Value("${keycloak.realm}")
     private String realm;
 

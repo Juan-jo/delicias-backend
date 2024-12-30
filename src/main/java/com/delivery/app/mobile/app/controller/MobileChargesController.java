@@ -1,5 +1,6 @@
 package com.delivery.app.mobile.app.controller;
 
+import com.delivery.app.mobile.app.dto.ChargesDTO;
 import com.delivery.app.mobile.app.service.MobileConfigService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @CrossOrigin(originPatterns = {"*"})
@@ -20,7 +20,7 @@ public class MobileChargesController {
     private final MobileConfigService mobileConfigService;
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<Map<String, Object>> load(
+    public ResponseEntity<ChargesDTO> load(
             @Valid @PathVariable Integer restaurantId,
             @RequestHeader("LatLng") String destination) {
 
@@ -32,6 +32,16 @@ public class MobileChargesController {
         return ResponseEntity.ok(
                 mobileConfigService.loadCharges(restaurantId, latitude, longitude)
         );
+    }
 
+    @GetMapping("/restaurant/{restaurantId}/address/{userAddressId}")
+    public ResponseEntity<ChargesDTO> load(
+            @Valid @PathVariable Integer restaurantId,
+            @Valid @PathVariable Integer userAddressId
+    ) {
+
+        return ResponseEntity.ok(
+                mobileConfigService.loadCharges(restaurantId, userAddressId)
+        );
     }
 }
