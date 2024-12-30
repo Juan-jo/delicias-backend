@@ -4,7 +4,7 @@ import com.delivery.app.product.template.models.ProductTemplate;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +32,6 @@ public class ShoppingCartLine {
     private Integer qty;
 
     @Column(columnDefinition = "int[]", name = "attr_value_ids")
-    private List<Integer> attr_values_ids;
+    private Set<Integer> attrValuesIds;
 
 }
