@@ -1422,3 +1422,106 @@ databaseChangeLog:
               ON delivery_order_rel
               FOR EACH ROW
               EXECUTE FUNCTION update_orders_trigger_function();
+
+  -  changeSet:
+       id: 27032024_46
+       author: jdev
+       changes:
+         -  createTable:
+              tableName: shopping_cart
+              columns:
+                - column:
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: pk_shopping_cart_id
+                    name: id
+                    type: UUID
+                    defaultValue: uuid_generate_v4()
+                - column:
+                    constraints:
+                      nullable: false
+                    name: user_uid
+                    type: UUID
+                    remarks: Keycloak user ID
+                - column:
+                    constraints:
+                      nullable: false
+                    name: restaurant_id
+                    type: INTEGER
+                    remarks: Restaurant ID
+                - column:
+                    constraints:
+                      nullable: true
+                    name: user_address_id
+                    type: INTEGER
+                    remarks: User address delivery
+         - addUniqueConstraint:
+             columnNames: restaurant_id, user_uid
+             constraintName: shopping_cart_restaurant_id_user_uid_unique
+             schemaName: public
+             tableName: shopping_cart
+             validate: true
+         - addForeignKeyConstraint:
+             baseColumnNames: restaurant_id
+             baseTableName: shopping_cart
+             constraintName: shopping_cart_restaurant_template_fkey
+             referencedColumnNames: id
+             referencedTableName: restaurant_template
+             validate: true
+         - addForeignKeyConstraint:
+             baseColumnNames: user_address_id
+             baseTableName: shopping_cart
+             constraintName: shopping_cart_user_address_fkey
+             referencedColumnNames: id
+             referencedTableName: user_addresses
+             validate: true
+
+  -  changeSet:
+       id: 27032024_47
+       author: jdev
+       changes:
+         -  createTable:
+              tableName: shopping_cart_line
+              columns:
+                - column:
+                    constraints:
+                      nullable: false
+                      primaryKey: true
+                      primaryKeyName: pk_shopping_car_line_id
+                    name: id
+                    type: UUID
+                    defaultValue: uuid_generate_v4()
+                - column:
+                    constraints:
+                      nullable: false
+                    name: shopping_cart_id
+                    type: UUID
+                - column:
+                    constraints:
+                      nullable: false
+                    name: product_tmpl_id
+                    type: INTEGER
+                    remarks: Product ID
+                - column:
+                    constraints:
+                      nullable: true
+                    name: qty
+                    type: INTEGER
+                    remarks: Quantity added
+                - column:
+                    name: attr_value_ids
+                    type: int[]
+                    remarks: List of Id`s attribute values
+         - addForeignKeyConstraint:
+             baseColumnNames: product_tmpl_id
+             baseTableName: shopping_cart_line
+             constraintName: shopping_cart_line_product_tmpl_id_fkey
+             referencedColumnNames: id
+             referencedTableName: product_template
+         - addForeignKeyConstraint:
+             baseColumnNames: shopping_cart_id
+             baseTableName: shopping_cart_line
+             constraintName: shopping_cart_line_shopping_cart_id_fkey
+             referencedColumnNames: id
+             referencedTableName: shopping_cart
