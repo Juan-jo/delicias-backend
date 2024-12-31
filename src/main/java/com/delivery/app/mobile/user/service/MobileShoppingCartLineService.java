@@ -1,7 +1,7 @@
 package com.delivery.app.mobile.user.service;
 
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.mobile.user.dtos.MobileAddShoppingCartLineDTO;
+import com.delivery.app.mobile.user.dtos.MobileShoppingCartLineDTO;
 import com.delivery.app.mobile.user.models.ShoppingCart;
 import com.delivery.app.mobile.user.models.ShoppingCartLine;
 import com.delivery.app.mobile.user.repository.ShoppingCartLineRepository;
@@ -25,7 +25,7 @@ public class MobileShoppingCartLineService {
     private final ShoppingCartLineRepository shoppingCartLineRepository;
 
     @Transactional
-    public void addShoppingCartLine(MobileAddShoppingCartLineDTO shoppingCartLineDTO) {
+    public void addShoppingCartLine(MobileShoppingCartLineDTO shoppingCartLineDTO) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UUID userUid = UUID.fromString(authentication.getName());
@@ -57,4 +57,24 @@ public class MobileShoppingCartLineService {
         );
 
     }
+
+    @Transactional
+    public void updateShoppingCartLine(MobileShoppingCartLineDTO shoppingCartLineDTO) {
+
+        ShoppingCartLine shoppingCartLine = shoppingCartLineRepository.findById(shoppingCartLineDTO.id())
+                .orElseThrow(() -> new ResourceNotFoundException("ShoppingCartLine", "id", shoppingCartLineDTO.id()));
+
+        shoppingCartLine.updateQty(shoppingCartLineDTO.qty(), shoppingCartLineDTO.attrValues());
+    }
+
+
+    @Transactional
+    public void deleteShoppingCartLine(UUID shoppingCartLineId) {
+
+        ShoppingCartLine shoppingCartLine = shoppingCartLineRepository.findById(shoppingCartLineId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShoppingCartLine", "id", shoppingCartLineId));
+
+        shoppingCartLineRepository.delete(shoppingCartLine);
+    }
+
 }

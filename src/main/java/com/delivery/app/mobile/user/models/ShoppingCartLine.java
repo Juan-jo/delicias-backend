@@ -34,4 +34,8 @@ public class ShoppingCartLine {
     @Column(columnDefinition = "int[]", name = "attr_value_ids")
     private Set<Integer> attrValuesIds;
 
+    public void updateQty(Integer qty, Set<Integer> attrValuesIds) {
+        this.qty = qty;
+        this.attrValuesIds = attrValuesIds;
+    }
 }
