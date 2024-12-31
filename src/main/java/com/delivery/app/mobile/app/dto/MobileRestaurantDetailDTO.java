@@ -1,11 +1,15 @@
 package com.delivery.app.mobile.app.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public record MobileRestaurantDetailDTO(
         Integer id,
@@ -13,7 +17,10 @@ public record MobileRestaurantDetailDTO(
         String imageCover,
         RestaurantInfo info,
         List<RecommendedItem> recommended,
-        List<Menu> menu
+        List<Menu> menu,
+        boolean alreadyExistsShoppingCart,
+        Integer shoppingCartLinesSize,
+        UUID shoppingCartId
 ) {
 
     @Builder

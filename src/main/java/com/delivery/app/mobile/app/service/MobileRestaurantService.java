@@ -3,22 +3,22 @@ package com.delivery.app.mobile.app.service;
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.mobile.app.dto.MobileRestaurantDetailDTO;
+import com.delivery.app.mobile.user.models.ShoppingCart;
+import com.delivery.app.mobile.user.repository.ShoppingCartRepository;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.restaurant.menu.model.RestaurantTmplMenu;
-import com.delivery.app.restaurant.menu.repository.RestaurantTmplMenuRepository;
 import com.delivery.app.restaurant.schedule.model.RestaurantTmplSchedule;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -28,11 +28,20 @@ public class MobileRestaurantService {
     private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final ProductTemplateRepository productTemplateRepository;
     private final DeliciasAppProperties deliciasAppProperties;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     public MobileRestaurantDetailDTO detail(Integer restaurantId) {
 
         RestaurantTemplate restaurantTmpl = restaurantTemplateRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("RestaurantTmpl", "id", restaurantId));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID userUID = UUID.fromString(authentication.getName());
+
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUserUIDAndRestaurantId(
+                userUID,
+                restaurantId
+        ).orElse(null);
 
         DayOfWeek today = LocalDateTime.now().plusHours(deliciasAppProperties.getTimezone()).getDayOfWeek();
         LocalTime realTime = LocalTime.now().plusHours(deliciasAppProperties.getTimezone());
@@ -45,6 +54,9 @@ public class MobileRestaurantService {
         return MobileRestaurantDetailDTO.builder()
                         .id(restaurantTmpl.getId())
                         .name(restaurantTmpl.getName())
+                        .alreadyExistsShoppingCart(shoppingCart != null)
+                        .shoppingCartId(Optional.ofNullable(shoppingCart).map(ShoppingCart::getId).orElse(null))
+                        .shoppingCartLinesSize(Optional.ofNullable(shoppingCart).map(i->i.getLines().size()).orElse(0))
                         .imageCover(Optional.ofNullable(restaurantTmpl.getImageCover())
                                 .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
                                 .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
