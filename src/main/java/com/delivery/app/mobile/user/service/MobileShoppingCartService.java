@@ -65,12 +65,15 @@ public class MobileShoppingCartService {
                     .map(i-> Optional.ofNullable(i.getExtraPrice()).orElse(0.0))
                     .reduce(0.0, Double::sum) * line.getQty();
 
-            subtotal += totalAmountAttrValues + (line.getQty() * line.getProductTemplate().getListPrice());
+            double amountLineAdded = totalAmountAttrValues + (line.getQty() * line.getProductTemplate().getListPrice());
+
+            subtotal += amountLineAdded;
 
             lines.add(MobileShoppingCartDTO.ShoppingLine.builder()
                             .id(line.getId())
-                            .price(line.getProductTemplate().getListPrice())
+                            .amount(amountLineAdded)
                             .qty(line.getQty())
+                            .productTmplId(line.getProductTemplate().getId())
                             .productTmplName(line.getProductTemplate().getName())
                             .productTmplDescription(line.getProductTemplate().getDescription())
                     .build());

@@ -21,10 +21,11 @@ public record MobileShoppingCartDTO(
     @Builder
     public record ShoppingLine(
             UUID id,
+            Integer productTmplId,
             String productTmplName,
             String productTmplDescription,
             Integer qty,
-            double price
+            double amount
     ) {}
 
     @Builder
