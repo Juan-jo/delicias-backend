@@ -77,4 +77,16 @@ public class MobileShoppingCartLineService {
         shoppingCartLineRepository.delete(shoppingCartLine);
     }
 
+    public MobileShoppingCartLineDTO getShoppingLine(UUID shoppingCartLineId) {
+
+        return shoppingCartLineRepository.findById(shoppingCartLineId)
+                .map(line -> MobileShoppingCartLineDTO.builder()
+                        .id(line.getId())
+                        .qty(line.getQty())
+                        .attrValues(line.getAttrValuesIds())
+                        .build())
+                .orElseThrow(() -> new ResourceNotFoundException("ShoppingCartLine", "id", shoppingCartLineId));
+
+    }
+
 }

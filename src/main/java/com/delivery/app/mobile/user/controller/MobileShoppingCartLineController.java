@@ -55,6 +55,15 @@ public class MobileShoppingCartLineController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{shoppingCartLineId}")
+    public ResponseEntity<MobileShoppingCartLineDTO> getShippingLine(
+            @NotNull @PathVariable UUID shoppingCartLineId
+    ) {
+
+        return ResponseEntity.ok(
+                mobileShoppingCartLineService.getShoppingLine(shoppingCartLineId)
+        );
+    }
 
 
 }
