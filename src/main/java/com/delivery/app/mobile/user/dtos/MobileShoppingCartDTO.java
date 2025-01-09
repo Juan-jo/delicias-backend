@@ -30,9 +30,9 @@ public record MobileShoppingCartDTO(
 
     @Builder
     public record ShoppingCartDeliveryAddress(
-            Integer id,
             String name,
-            String address
+            String address,
+            String icon
     ) {}
 
 }

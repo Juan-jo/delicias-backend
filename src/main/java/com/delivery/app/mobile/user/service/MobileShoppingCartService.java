@@ -2,6 +2,7 @@ package com.delivery.app.mobile.user.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
+import com.delivery.app.mobile.app.service.MobileConfigService;
 import com.delivery.app.mobile.user.dtos.MobileShoppingCartAvailableDTO;
 import com.delivery.app.mobile.user.dtos.MobileShoppingCartDTO;
 import com.delivery.app.mobile.user.models.ShoppingCart;
@@ -18,12 +19,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.delivery.app.security.enums.UserAddressType.OFFICE;
+
 @AllArgsConstructor
 @Service
 public class MobileShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final DeliciasAppProperties deliciasAppProperties;
+    private final MobileConfigService mobileConfigService;
+
 
     public List<MobileShoppingCartAvailableDTO> availableShoppingCart() {
 
@@ -80,12 +85,36 @@ public class MobileShoppingCartService {
 
         }
 
+        boolean hasDeliveryAddress = Optional.ofNullable(shoppingCart.getUserAddress()).isPresent();
+
+        if(hasDeliveryAddress) {
+            var charges = mobileConfigService.loadCharges(shoppingCart.getRestaurant().getId(), shoppingCart.getUserAddress().getId());
+            shipmentCost = charges.shipmentCost();
+        }
+
         return MobileShoppingCartDTO.builder()
                 .id(shoppingCart.getId())
                 .shoppingLines(lines)
                 .shipmentCost(shipmentCost)
                 .subtotal(subtotal)
                 .total(subtotal + shipmentCost)
+                .hasDeliveryAddress(hasDeliveryAddress)
+                .deliveryAddress(hasDeliveryAddress
+                        ? MobileShoppingCartDTO.ShoppingCartDeliveryAddress.builder()
+                                .address(shoppingCart.getUserAddress().getAddress())
+                                .name(shoppingCart.getUserAddress().getAddressType().equals(OFFICE)
+                                        ? shoppingCart.getUserAddress().getCompanyName()
+                                        : shoppingCart.getUserAddress().getDetails()
+                                )
+                                .icon(switch (shoppingCart.getUserAddress().getAddressType()) {
+                                    case HOME -> "assets/fd/home.svg";
+                                    case DEPTO -> "assets/fd/depto.svg";
+                                    case OFFICE -> "assets/fd/office.svg";
+                                    case OTHER -> "assets/fd/other.svg";
+                                })
+                            .build()
+                        : null
+                )
                 .build();
     }
 }
