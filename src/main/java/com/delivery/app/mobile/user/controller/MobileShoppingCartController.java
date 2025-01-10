@@ -38,4 +38,13 @@ public class MobileShoppingCartController {
                 mobileShoppingCartService.availableShoppingCart()
         );
     }
+
+    @PostMapping("/{shoppingCartId}/delivery/{userAddressId}")
+    public ResponseEntity<Void> setDeliveryAddress(
+            @NotNull @PathVariable UUID shoppingCartId,
+            @NotNull @PathVariable Integer userAddressId
+    ) {
+        mobileShoppingCartService.setDeliveryAddress(shoppingCartId, userAddressId);
+        return ResponseEntity.ok().build();
+    }
 }

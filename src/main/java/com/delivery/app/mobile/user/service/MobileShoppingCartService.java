@@ -8,6 +8,8 @@ import com.delivery.app.mobile.user.dtos.MobileShoppingCartDTO;
 import com.delivery.app.mobile.user.models.ShoppingCart;
 import com.delivery.app.mobile.user.models.ShoppingCartLine;
 import com.delivery.app.mobile.user.repository.ShoppingCartRepository;
+import com.delivery.app.security.model.UserAddress;
+import com.delivery.app.security.repository.UserAddressRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,7 @@ public class MobileShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final DeliciasAppProperties deliciasAppProperties;
     private final MobileConfigService mobileConfigService;
+    private final UserAddressRepository userAddressRepository;
 
 
     public List<MobileShoppingCartAvailableDTO> availableShoppingCart() {
@@ -41,13 +44,13 @@ public class MobileShoppingCartService {
                         .id(cart.getId())
                         .restaurantName(cart.getRestaurant().getName())
                         .restaurantLogo(Optional.ofNullable(cart.getRestaurant().getImageLogo())
-                                .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), d))
+                                .map(d -> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), d))
                                 .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
                         .lineCount(cart.getLines().size())
                         .build())
                 .toList();
     }
-    
+
     @Transactional(readOnly = true)
     public MobileShoppingCartDTO findById(UUID shoppingCartId) {
 
@@ -59,15 +62,15 @@ public class MobileShoppingCartService {
 
         List<MobileShoppingCartDTO.ShoppingLine> lines = new ArrayList<>();
 
-        for(ShoppingCartLine line: shoppingCart.getLines()) {
+        for (ShoppingCartLine line : shoppingCart.getLines()) {
 
             // calculate total attr values
-            double totalAmountAttrValues =  0.0;
+            double totalAmountAttrValues = 0.0;
 
             totalAmountAttrValues += line.getProductTemplate().getAttributeValues()
                     .stream()
                     .filter(attrVal -> line.getAttrValuesIds().contains(attrVal.getId()))
-                    .map(i-> Optional.ofNullable(i.getExtraPrice()).orElse(0.0))
+                    .map(i -> Optional.ofNullable(i.getExtraPrice()).orElse(0.0))
                     .reduce(0.0, Double::sum) * line.getQty();
 
             double amountLineAdded = totalAmountAttrValues + (line.getQty() * line.getProductTemplate().getListPrice());
@@ -75,19 +78,19 @@ public class MobileShoppingCartService {
             subtotal += amountLineAdded;
 
             lines.add(MobileShoppingCartDTO.ShoppingLine.builder()
-                            .id(line.getId())
-                            .amount(amountLineAdded)
-                            .qty(line.getQty())
-                            .productTmplId(line.getProductTemplate().getId())
-                            .productTmplName(line.getProductTemplate().getName())
-                            .productTmplDescription(line.getProductTemplate().getDescription())
+                    .id(line.getId())
+                    .amount(amountLineAdded)
+                    .qty(line.getQty())
+                    .productTmplId(line.getProductTemplate().getId())
+                    .productTmplName(line.getProductTemplate().getName())
+                    .productTmplDescription(line.getProductTemplate().getDescription())
                     .build());
 
         }
 
         boolean hasDeliveryAddress = Optional.ofNullable(shoppingCart.getUserAddress()).isPresent();
 
-        if(hasDeliveryAddress) {
+        if (hasDeliveryAddress) {
             var charges = mobileConfigService.loadCharges(shoppingCart.getRestaurant().getId(), shoppingCart.getUserAddress().getId());
             shipmentCost = charges.shipmentCost();
         }
@@ -101,20 +104,34 @@ public class MobileShoppingCartService {
                 .hasDeliveryAddress(hasDeliveryAddress)
                 .deliveryAddress(hasDeliveryAddress
                         ? MobileShoppingCartDTO.ShoppingCartDeliveryAddress.builder()
-                                .address(shoppingCart.getUserAddress().getAddress())
-                                .name(shoppingCart.getUserAddress().getAddressType().equals(OFFICE)
-                                        ? shoppingCart.getUserAddress().getCompanyName()
-                                        : shoppingCart.getUserAddress().getDetails()
-                                )
-                                .icon(switch (shoppingCart.getUserAddress().getAddressType()) {
-                                    case HOME -> "assets/fd/home.svg";
-                                    case DEPTO -> "assets/fd/depto.svg";
-                                    case OFFICE -> "assets/fd/office.svg";
-                                    case OTHER -> "assets/fd/other.svg";
-                                })
-                            .build()
+                        .address(shoppingCart.getUserAddress().getAddress())
+                        .name(shoppingCart.getUserAddress().getAddressType().equals(OFFICE)
+                                ? shoppingCart.getUserAddress().getCompanyName()
+                                : shoppingCart.getUserAddress().getDetails()
+                        )
+                        .icon(switch (shoppingCart.getUserAddress().getAddressType()) {
+                            case HOME -> "assets/fd/home.svg";
+                            case DEPTO -> "assets/fd/depto.svg";
+                            case OFFICE -> "assets/fd/office.svg";
+                            case OTHER -> "assets/fd/other.svg";
+                        })
+                        .build()
                         : null
                 )
                 .build();
+    }
+
+
+    @Transactional
+    public void setDeliveryAddress(UUID shoppingCartId, Integer userAddressId) {
+
+        ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShoppingCart", "id", shoppingCartId));
+
+        UserAddress userAddress = userAddressRepository.findById(userAddressId)
+                .orElseThrow(() -> new ResourceNotFoundException("ShoppingCart", "id", shoppingCartId));
+
+        shoppingCart.setUserAddress(userAddress);
+
     }
 }
