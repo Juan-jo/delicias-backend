@@ -62,7 +62,7 @@ jwt:
 keycloak:
   use-resource-role-mappings: true
   realm: delicias-app
-  domain: 192.168.101.10:9001 # localhost:9001 #192.168.101.16:9001
+  domain: 192.168.101.100:9001 # localhost:9001 #192.168.101.16:9001
   adminClientId: admin-cli
   adminClientSecret: PP8mW3FCVO2vbC0dsiJFU6A8czcBokvx
   client: deliciasapp-auth-client
@@ -77,7 +77,7 @@ delicias:
   production: true
   timezone: -6 #America/Mexico_City
   files:
-    server: 'http://192.168.101.10:9095'
+    server: 'http://192.168.101.100:9095'
     resources: ${delicias.files.server}/resources
     staticDefault: ${delicias.files.server}/static/dl.png
     upload:

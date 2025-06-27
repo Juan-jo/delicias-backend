@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -104,6 +105,7 @@ public class ProductTemplateService {
                         .attributeValue(r.getNameAttr() + " - " + r.getNameAttrValue())
                         .sequence(r.getSequenceAttrValue())
                         .extraPrice(r.getExtraPrice())
+                        .displayType(r.getDisplayType())
                         .build()).toList();
     }
 
@@ -122,6 +124,11 @@ public class ProductTemplateService {
                 .categName(r.getCategory().getName())
                 .createdAt(r.getCreatedAt())
                 .updatedAt(r.getUpdatedAt())
+                .picture(
+                        Optional.ofNullable(r.getPicture())
+                                .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
+                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                )
                 .build());
     }
 

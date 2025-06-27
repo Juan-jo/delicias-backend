@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
+
 @Repository
 public interface RestaurantTemplateRepository extends JpaRepository<RestaurantTemplate, Integer> {
 
@@ -31,4 +34,5 @@ public interface RestaurantTemplateRepository extends JpaRepository<RestaurantTe
                             @Param("longitude") double lng,
                             @Param("latitude") double lat);
 
+    List<RestaurantTemplate> findByIdIn(Collection<Integer> tmplIds);
 }

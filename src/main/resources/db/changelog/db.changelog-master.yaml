@@ -1525,3 +1525,43 @@ databaseChangeLog:
              constraintName: shopping_cart_line_shopping_cart_id_fkey
              referencedColumnNames: id
              referencedTableName: shopping_cart
+  - changeSet:
+      id: 27032024_48
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: product_attribute
+            columns:
+              - column:
+                  name: product_tmpl_id
+                  type: INTEGER
+                  remarks: Product Tmpl Rel
+        - addForeignKeyConstraint:
+            baseColumnNames: product_tmpl_id
+            baseTableName: product_attribute
+            constraintName: product_attribute_product_tmpl_id_fkey
+            referencedColumnNames: id
+            referencedTableName: product_template
+  -  changeSet:
+       id:  27032024_49
+       author:  jdev
+       changes:
+         -  createView:
+              encoding:  UTF-8
+              replaceIfExists:  true
+              schemaName:  public
+              selectQuery:  select
+                ptpavr.id ,
+                ptpavr.product_tmpl_id,
+                pav."name" as "name_attr_val" ,
+                pav."sequence" as "sequence_attr_val",
+                pa."name" as "name_attr",
+                pa."sequence" as "sequence_attr",
+                pav.default_extra_price,
+                pa.display_type as display_type
+                from
+                product_template_product_attribute_value_rel ptpavr
+                join product_attribute_value pav on ptpavr.product_attribute_value_id = pav.id
+                join product_attribute pa on ptpavr.attribute_id = pa.id
+                order by pa."sequence" , pav."sequence"
+              viewName:  product_tmpl_attr_values

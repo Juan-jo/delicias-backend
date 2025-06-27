@@ -94,6 +94,11 @@ public class RestaurantTmplConfigService {
                         .id(r.getId())
                         .categ(r.getCategory().getName())
                         .name(r.getName())
+                        .picture(
+                                Optional.ofNullable(r.getPicture())
+                                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
+                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                        )
                         .build())
                 .collect(Collectors.groupingBy(RestaurantTmplConfigDTO.ProductTmpl::categ));
 

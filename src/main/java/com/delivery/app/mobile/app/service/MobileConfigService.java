@@ -17,7 +17,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @AllArgsConstructor
@@ -61,6 +63,13 @@ public class MobileConfigService {
         );
     }
 
+    public MobileConfigDTO mobileConfig() {
+
+        return mobileConfigRepository.findById(confId)
+                .map(modelToDTO())
+                .orElseThrow(() -> new ResourceNotFoundException("Mobile Config", "id", confId));
+    }
+
     public ChargesDTO loadCharges(
             Integer restaurantId,
             Integer userAddressId
@@ -75,6 +84,9 @@ public class MobileConfigService {
     private Function<MobileConfig, MobileConfigDTO> modelToDTO() {
         return model -> MobileConfigDTO.builder()
                 .costService(model.getCostService())
+                .availableRestaurants(Optional.ofNullable(model.getAvailableRestaurants()).orElse(List.of()))
+                .latitude(model.getZone().getY())
+                .longitude(model.getZone().getX())
                 .build();
     }
 

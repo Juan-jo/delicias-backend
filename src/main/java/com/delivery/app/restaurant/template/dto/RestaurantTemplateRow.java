@@ -12,5 +12,6 @@ public record RestaurantTemplateRow(
         @JsonFormat(pattern="dd/MM/yyyy HH:mm:ss")
         LocalDateTime createdAt,
         @JsonFormat(pattern="dd/MM/yyyy HH:mm:ss")
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        String picture
 ) { }

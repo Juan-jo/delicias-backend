@@ -3,14 +3,12 @@ package com.delivery.app.mobile.app.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
+import com.delivery.app.mobile.app.dto.MobileProductRecommendedDTO;
 import com.delivery.app.mobile.app.dto.MobileProductTmplDetailDTO;
-import com.delivery.app.mobile.app.dto.ProductFilterRequestDTO;
-import com.delivery.app.mobile.app.dto.ProductTemplateItemDTO;
 import com.delivery.app.product.attribute.models.ProductAttributeValue;
 import com.delivery.app.product.template.models.ProductTemplate;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,21 +21,22 @@ public class MobileProductService {
     private final ProductTemplateRepository productTemplateRepository;
     private final DeliciasAppProperties deliciasAppProperties;
 
-    public Page<ProductTemplateItemDTO> loadProductTemplate(
-            ProductFilterRequestDTO productFilterRequestDTO) {
 
-        Random random = new Random();
 
-        return productTemplateRepository.findAll(productFilterRequestDTO.pageable())
-                .map(tmpl->ProductTemplateItemDTO.builder()
-                        .id(tmpl.getId())
-                        .name(tmpl.getName())
-                        .listPrice(tmpl.getListPrice())
-                        .picture(Optional.ofNullable(tmpl.getPicture()).orElse("https://coffee.alexflipnote.dev/random"))
-                        .soldBy("Restaurant name")
-                        .rate(random.nextInt(5 - 1 + 1) + 1)
-                        .restaurantName(tmpl.getRestaurantTmpl().getName())
-                        .build());
+    public List<MobileProductRecommendedDTO> loadRecommended() {
+
+        return productTemplateRepository.findByIdIn(List.of(19, 14, 16, 20, 12, 17))
+                .stream().map( i ->
+                        new MobileProductRecommendedDTO(
+                                i.getId(),
+                                i.getName(),
+                                i.getDescription(),
+                                i.getListPrice(),
+                                Optional.ofNullable(i.getPicture())
+                                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), d))
+                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
+                        )
+                .toList();
     }
 
     public MobileProductTmplDetailDTO detail(Integer id) {

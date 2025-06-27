@@ -2,7 +2,10 @@ package com.delivery.app.mobile.app.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
+import com.delivery.app.mobile.app.dto.MobileConfigDTO;
 import com.delivery.app.mobile.app.dto.MobileRestaurantDetailDTO;
+import com.delivery.app.mobile.app.dto.MobileRestaurantItemDTO;
+import com.delivery.app.mobile.app.repository.MobileConfigRepository;
 import com.delivery.app.mobile.user.models.ShoppingCart;
 import com.delivery.app.mobile.user.repository.ShoppingCartRepository;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
@@ -29,6 +32,7 @@ public class MobileRestaurantService {
     private final ProductTemplateRepository productTemplateRepository;
     private final DeliciasAppProperties deliciasAppProperties;
     private final ShoppingCartRepository shoppingCartRepository;
+    private final MobileConfigService mobileConfigService;
 
     public MobileRestaurantDetailDTO detail(Integer restaurantId) {
 
@@ -91,6 +95,26 @@ public class MobileRestaurantService {
                                 .toList())
                         .build();
     }
+
+    public List<MobileRestaurantItemDTO> loadRestaurants() {
+
+        MobileConfigDTO mobileConfig = mobileConfigService.mobileConfig();
+
+        return restaurantTemplateRepository.findByIdIn(mobileConfig.availableRestaurants()).stream().map( i ->
+                new MobileRestaurantItemDTO(
+                        i.getId(),
+                        i.getName(),
+                        i.getDescription(),
+                        Optional.ofNullable(i.getImageLogo())
+                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
+                                .orElse(deliciasAppProperties.getFiles().getStaticDefault()),
+                        Optional.ofNullable(i.getImageCover())
+                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
+                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                ))
+                .toList();
+    }
+
 
     private List<ProductItem> getAllProducts(Set<RestaurantTmplMenu> menus, List<Integer> recommended) {
 

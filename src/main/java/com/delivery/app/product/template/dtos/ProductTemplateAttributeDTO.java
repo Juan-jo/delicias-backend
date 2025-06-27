@@ -20,5 +20,7 @@ public record ProductTemplateAttributeDTO (
         @NotNull(message = "sequence is mandatory", groups = { OnCreate.class, OnUpdate.class})
         Integer sequence,
 
-        Integer restaurantId
+        Integer restaurantId,
+
+        Integer productTemplateId
 ){ }

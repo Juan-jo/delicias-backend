@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -77,6 +78,11 @@ public class RestaurantTemplateService {
                 .name(r.getName())
                 .updatedAt(r.getUpdatedAt())
                 .createdAt(r.getCreatedAt())
+                .picture(
+                        Optional.ofNullable(r.getImageLogo())
+                                .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
+                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                )
                 .build());
 
     }
@@ -97,6 +103,11 @@ public class RestaurantTemplateService {
                 .stream().map(r -> RestaurantTmplOptionDTO.builder()
                         .id(r.getId())
                         .name(r.getName())
+                        .picture(
+                                Optional.ofNullable(r.getImageLogo())
+                                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
+                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                        )
                         .build())
                 .toList();
     }
@@ -134,6 +145,7 @@ public class RestaurantTemplateService {
                 .name(template.getName())
                 .description(template.getDescription())
                 .phone(template.getPhone())
+                .logoPicture(template.getImageLogo())
                 .build();
 
     }

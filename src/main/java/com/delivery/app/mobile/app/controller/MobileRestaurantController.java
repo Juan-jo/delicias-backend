@@ -1,12 +1,15 @@
 package com.delivery.app.mobile.app.controller;
 
 import com.delivery.app.mobile.app.dto.MobileRestaurantDetailDTO;
+import com.delivery.app.mobile.app.dto.MobileRestaurantItemDTO;
 import com.delivery.app.mobile.app.service.MobileRestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -23,6 +26,14 @@ public class MobileRestaurantController {
     ) {
         return ResponseEntity.ok(
                 mobileRestaurantService.detail(restaurantId)
+        );
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<MobileRestaurantItemDTO>> loadRestaurant() {
+        return ResponseEntity.ok(
+                mobileRestaurantService.loadRestaurants()
         );
     }
 

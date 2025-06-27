@@ -21,5 +21,7 @@ public record RestaurantTemplateDTO(
         String description,
 
         @Size(max = 15, message = "Not valid phone. Must have minimum 1 chars or maximum 500 chars.", groups = { OnCreate.class, OnUpdate.class})
-        String phone
+        String phone,
+
+        String logoPicture
 ) { }

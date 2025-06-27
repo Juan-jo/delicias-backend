@@ -87,7 +87,8 @@ public record RestaurantTmplConfigDTO(
     public record ProductTmpl(
             Integer id,
             String categ,
-            String name
+            String name,
+            String picture
     ) {
 
     }

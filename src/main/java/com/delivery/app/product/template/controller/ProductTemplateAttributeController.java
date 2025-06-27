@@ -22,12 +22,12 @@ public class ProductTemplateAttributeController {
 
     private final ProductTemplateAttributeService productTemplateAttributeService;
 
-    @GetMapping("/res/{restaurantId}")
+    @GetMapping("/tmpl/{productTmplId}")
     public ResponseEntity<List<ProductTemplateAttributeDTO>> getById(
-            @NotNull @PathVariable Integer restaurantId) {
+            @NotNull @PathVariable Integer productTmplId) {
 
         return ResponseEntity.ok(
-                productTemplateAttributeService.getAttributesByRestaurantId(restaurantId)
+                productTemplateAttributeService.getAttributesByProductTmplId(productTmplId)
         );
     }
 

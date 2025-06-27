@@ -37,4 +37,7 @@ public class ViewProductTmplAttrValue {
 
     @Column(name = "default_extra_price")
     private Double extraPrice;
+
+    @Column(name = "display_type")
+    private String displayType;
 }

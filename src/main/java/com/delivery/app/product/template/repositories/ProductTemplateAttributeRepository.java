@@ -11,6 +11,6 @@ import java.util.List;
 public interface ProductTemplateAttributeRepository extends JpaRepository<ProductAttribute, Integer> {
 
 
-    @Query("SELECT p FROM ProductAttribute p WHERE p.restaurantTmpl.id = :restaurantId ORDER BY p.sequence ASC")
-    List<ProductAttribute> findByRestaurantTmplId(Integer restaurantId);
+    @Query("SELECT p FROM ProductAttribute p WHERE p.productTemplate.id = :tmplId ORDER BY p.sequence ASC")
+    List<ProductAttribute> findByProductTmplId(Integer tmplId);
 }

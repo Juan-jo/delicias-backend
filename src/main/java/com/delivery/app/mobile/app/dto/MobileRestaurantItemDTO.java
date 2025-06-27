@@ -3,12 +3,10 @@ package com.delivery.app.mobile.app.dto;
 import lombok.Builder;
 
 @Builder
-public record ProductTemplateItemDTO(
+public record MobileRestaurantItemDTO(
         Integer id,
         String name,
-        Double listPrice,
+        String description,
         String picture,
-        String soldBy,
-        Integer rate,
-        String restaurantName
+        String cover
 ) { }

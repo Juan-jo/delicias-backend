@@ -5,5 +5,6 @@ import lombok.Builder;
 @Builder
 public record RestaurantTmplOptionDTO(
         Integer id,
-        String name
+        String name,
+        String picture
 ) { }

@@ -7,5 +7,6 @@ public record ProductTmplAttributeRowDTO(
         Integer id,
         String attributeValue,
         Integer sequence,
-        Double extraPrice
+        Double extraPrice,
+        String displayType
 ) { }
