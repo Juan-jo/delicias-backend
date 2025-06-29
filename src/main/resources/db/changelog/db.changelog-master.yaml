@@ -1565,3 +1565,79 @@ databaseChangeLog:
                 join product_attribute pa on ptpavr.attribute_id = pa.id
                 order by pa."sequence" , pav."sequence"
               viewName:  product_tmpl_attr_values
+
+  - changeSet:
+      id: 27032024_50
+      author: jdev
+      changes:
+        - createSequence:
+            cycle: false
+            dataType: INTEGER
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+            maxValue: 2147483647
+            schemaName: public
+            sequenceName: mobile_delivery_zone_id_seq
+        - createTable:
+            tableName: mobile_delivery_zone
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  remarks: ID Unique, PK
+                  defaultValueComputed: nextval('mobile_delivery_zone_id_seq')
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_mobile_delivery_zone_id
+              - column:
+                  name: name
+                  type: VARCHAR
+                  remarks: Zone name
+              - column:
+                  name: has_minimum_amount
+                  type: BOOL
+                  remarks: Zone has minimum amount
+                  constraints:
+                    nullable: false
+              - column:
+                  name: minimum_amount
+                  type: INTEGER
+                  remarks: Order minimum amount in the zone
+              - column:
+                  name: active
+                  type: BOOL
+                  remarks: Active
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: GEOGRAPHY(Point)
+                  remarks: longitud, latitud address location
+                  constraints:
+                    nullable: false
+              - column:
+                  name: radio_position
+                  type: INTEGER
+                  remarks: Radio available
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Created on
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  remarks: Last Updated on
+              - column:
+                  name: create_uid
+                  type: VARCHAR
+                  remarks: Created by
+              - column:
+                  name: write_uid
+                  type: VARCHAR
+                  remarks: Last Updated by
