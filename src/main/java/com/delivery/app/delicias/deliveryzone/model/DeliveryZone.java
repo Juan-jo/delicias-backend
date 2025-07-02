@@ -7,6 +7,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 @Entity
 @Table(name = "mobile_delivery_zone")
@@ -37,23 +38,16 @@ public class DeliveryZone extends AuditableEntity {
 
     private boolean active;
 
-    @Column(name = "position", columnDefinition = "GEOGRAPHY(Point, 4326)")
-    private Point position;
+    @Column(columnDefinition = "geometry(POLYGON,4326)")
+    private Polygon area;
 
-    @Column(name = "radio_position") // En metros
-    private Integer radioPosition;
-
-    public void update(DeliveryZoneDTO req) {
+    public void update(DeliveryZoneDTO req, Polygon area) {
 
         name = req.name();
         hasMinimumAmount = req.hasMinimumAmount();
         minimumAmount = req.minimumAmount();
         active = req.active();
-        position = new GeometryFactory().createPoint(new Coordinate(
-                req.position().longitude(),
-                req.position().latitude()
-        ));
-        radioPosition = req.position().radioPosition();
+        this.area = area;
     }
 
 }

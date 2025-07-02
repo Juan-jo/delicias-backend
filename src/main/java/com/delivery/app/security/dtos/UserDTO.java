@@ -33,5 +33,7 @@ public record UserDTO(
         @NotNull(message = "roleName is mandatory", groups = { OnCreate.class, OnUpdate.class})
         String roleName,
 
-        Integer restaurantId
+        Integer restaurantId,
+
+        Integer deliveryZoneId
 ) { }

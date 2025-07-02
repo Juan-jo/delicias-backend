@@ -3,6 +3,7 @@ package com.delivery.app.delicias.deliveryzone.controller;
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnFilter;
 import com.delivery.app.configs.validation.common.OnUpdate;
+import com.delivery.app.delicias.deliveryzone.dto.DeliverZoneLatLngDTO;
 import com.delivery.app.delicias.deliveryzone.dto.DeliveryZoneDTO;
 import com.delivery.app.delicias.deliveryzone.dto.DeliveryZoneReqFilter;
 import com.delivery.app.delicias.deliveryzone.service.DeliveryZoneService;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(originPatterns = {"*"})
 @RestController
@@ -77,6 +80,15 @@ public class DeliveryZoneController {
         deliveryZoneService.deleteById(deliveryZoneId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ROOT')")
+    @GetMapping("/all")
+    public ResponseEntity<List<DeliverZoneLatLngDTO>> all() {
+
+        return ResponseEntity.ok(
+                deliveryZoneService.all()
+        );
     }
 
 }

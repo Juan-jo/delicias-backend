@@ -28,8 +28,10 @@ import java.util.stream.Collectors;
 @Service
 public class KeycloakUserServiceImpl implements KeycloakUserService {
 
-    private static final String ROLE_PREFIX = "ROLE_";
     private static final String ATTR_STORE = "store";
+    private static final String ATTR_DELIVERY_ZONE = "deliveryZoneId";
+
+    private static final String ROLE_PREFIX = "ROLE_";
     private static final String ROLE_STORE = "ROLE_STORE";
 
     static final String ATTR_LAST_USER_ADDRESS_ID  = "lastUserAddressId";
@@ -127,16 +129,32 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         user.setLastName(userDTO.lastName());
         user.setEmailVerified(false);
 
-        if(userDTO.roleName().equals(ROLE_STORE)) {
+        Map<String, List<String>> attributes = new HashMap<>();
 
-            Optional.ofNullable(userDTO.restaurantId()).ifPresentOrElse(storeId -> {
+        Optional.ofNullable(userDTO.roleName()).ifPresent(role -> {
 
-                user.singleAttribute(ATTR_STORE, String.valueOf(userDTO.restaurantId()));
+            if(userDTO.roleName().equals(ROLE_STORE)) {
 
-            }, () -> {
-                throw new ResourceNotFoundException("isnotfound", "", "");
-            });
-        }
+                Optional.ofNullable(userDTO.restaurantId()).ifPresentOrElse(storeId -> {
+
+                    attributes.put(ATTR_DELIVERY_ZONE, Collections.singletonList(String.valueOf(userDTO.restaurantId())));
+
+                }, () -> {
+                    throw new ResourceNotFoundException("isnotfound", "", "");
+                });
+            }
+
+        });
+
+
+        // DeliveryZoneId only form user mobile
+        Optional.ofNullable(userDTO.deliveryZoneId()).ifPresent(value -> {
+
+            attributes.put(ATTR_DELIVERY_ZONE, Collections.singletonList(String.valueOf(value)));
+
+        });
+
+        user.setAttributes(attributes);
 
         CredentialRepresentation credentialRepresentation=new CredentialRepresentation();
         credentialRepresentation.setValue(userDTO.password());
@@ -210,6 +228,19 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
                             if(r.containsKey(ATTR_STORE)) {
 
                                 String firstAttr = r.get(ATTR_STORE).get(0);
+
+                                return Integer.valueOf(firstAttr);
+                            }
+
+                            return null;
+                        })
+                        .orElse(null))
+                .deliveryZoneId(Optional.ofNullable(user.getAttributes())
+                        .map(r -> {
+
+                            if(r.containsKey(ATTR_DELIVERY_ZONE)) {
+
+                                String firstAttr = r.get(ATTR_DELIVERY_ZONE).get(0);
 
                                 return Integer.valueOf(firstAttr);
                             }

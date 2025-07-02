@@ -1612,15 +1612,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: position
-                  type: GEOGRAPHY(Point)
-                  remarks: longitud, latitud address location
-                  constraints:
-                    nullable: false
-              - column:
-                  name: radio_position
-                  type: INTEGER
-                  remarks: Radio available
+                  name: area
+                  type: GEOMETRY(POLYGON, 4326)
+                  remarks: location area
                   constraints:
                     nullable: false
               - column:
@@ -1641,3 +1635,10 @@ databaseChangeLog:
                   name: write_uid
                   type: VARCHAR
                   remarks: Last Updated by
+  - changeSet:
+      id: 27032024_51
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              CREATE INDEX idx_zones_geom ON mobile_delivery_zone USING GIST (area);

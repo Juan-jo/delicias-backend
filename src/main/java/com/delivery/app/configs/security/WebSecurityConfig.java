@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -26,9 +27,11 @@ public class WebSecurityConfig {
 
 
         return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable) //  Desactiva CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/resources/**")).permitAll()
+                        .requestMatchers("/api/mobile/userRegister", "/api/mobile/userRegister/").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
