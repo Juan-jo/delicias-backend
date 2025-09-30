@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.TimeZone;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.delivery.app", "com.delicias.soft.services"})
 @EnableAsync
 public class AppApplication {
 

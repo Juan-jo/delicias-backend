@@ -1,7 +1,7 @@
 package com.delivery.app.pos.order.models;
 
+import com.delicias.soft.services.core.common.OrderStatus;
 import com.delivery.app.configs.auditable.model.AuditableEntity;
-import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.security.model.UserAddress;
 import jakarta.persistence.*;
@@ -11,9 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 @Entity

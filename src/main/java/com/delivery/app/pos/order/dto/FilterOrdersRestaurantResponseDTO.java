@@ -1,6 +1,6 @@
 package com.delivery.app.pos.order.dto;
 
-import com.delivery.app.pos.enums.OrderStatus;
+import com.delicias.soft.services.core.common.OrderStatus;
 import lombok.Builder;
 
 @Builder

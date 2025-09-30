@@ -1,7 +1,7 @@
 package com.delivery.app.pos.kanban.dtos;
 
+import com.delicias.soft.services.core.common.OrderStatus;
 import com.delivery.app.configs.validation.common.OnUpdate;
-import com.delivery.app.pos.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 
 

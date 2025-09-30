@@ -1,6 +1,6 @@
 package com.delivery.app.pos.kanban.dtos;
 
-import com.delivery.app.pos.enums.OrderStatus;
+import com.delicias.soft.services.core.common.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

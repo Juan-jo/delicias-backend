@@ -181,6 +181,11 @@
             <version>5.3.1</version> <!-- O la última versión estable -->
         </dependency>
 
+        <dependency>
+            <groupId>com.delicias.soft.services</groupId>
+            <artifactId>delicias-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
 
 

@@ -1,8 +1,9 @@
 package com.delivery.app.pos.kanban.service;
 
+import com.delicias.soft.services.core.common.OrderStatus;
+import com.delicias.soft.services.core.supabase.order.service.CoreSupabaseOrderService;
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.pos.kanban.dtos.PosKanbanOrderDTO;
 import com.delivery.app.pos.kanban.dtos.PosRestaurantKanbanDTO;
 import com.delivery.app.pos.kanban.dtos.UpdatePosRestaurantKanbanDTO;
@@ -10,11 +11,8 @@ import com.delivery.app.pos.kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.kanban.repository.PosRestaurantKanbanRepository;
 import com.delivery.app.pos.order.models.PosOrder;
 import com.delivery.app.pos.order.repositories.PosOrderRepository;
-import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import com.delivery.app.security.dtos.UserDTO;
 import com.delivery.app.security.services.KeycloakUserService;
-import com.delivery.app.supabase.order.dtos.SupOrderChangeStatusReqDTO;
-import com.delivery.app.supabase.order.service.SupOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +25,10 @@ import java.util.stream.Collectors;
 public class PosRestaurantKanbanService {
 
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
-    private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final PosOrderRepository posOrderRepository;
     private final KeycloakUserService keycloakUserService;
     private final DeliciasAppProperties deliciasAppProperties;
-    private final SupOrderService supOrderService;
+    private final CoreSupabaseOrderService coreSupabaseOrderService;
 
 
 
@@ -50,36 +47,34 @@ public class PosRestaurantKanbanService {
 
     private void acceptOrder(PosOrder order) {
 
-        order.setStatus(OrderStatus.ACCEPTED);
+        OrderStatus status = OrderStatus.ACCEPTED;
+
+        order.setStatus(status);
         posOrderRepository.save(order);
 
-        supOrderService.changeStatus(SupOrderChangeStatusReqDTO.builder()
-                .orderId(order.getId())
-                .status(OrderStatus.ACCEPTED.name())
-                .build());
+        coreSupabaseOrderService.changeStatus(order.getId(), status);
     }
 
     private void cookingOrder(PosOrder order) {
 
-        order.setStatus(OrderStatus.COOKING);
+        OrderStatus status = OrderStatus.COOKING;
+
+        order.setStatus(status);
         posOrderRepository.save(order);
 
-        supOrderService.changeStatus(SupOrderChangeStatusReqDTO.builder()
-                .orderId(order.getId())
-                .status(OrderStatus.COOKING.name())
-                .build());
+        coreSupabaseOrderService.changeStatus(order.getId(), status);
 
     }
 
     private void orderReadyToDeliver(PosOrder order) {
 
-        order.setStatus(OrderStatus.READY_FOR_DELIVERY);
+        OrderStatus status = OrderStatus.READY_FOR_DELIVERY;
+
+        order.setStatus(status);
         posOrderRepository.save(order);
 
-        supOrderService.changeStatus(SupOrderChangeStatusReqDTO.builder()
-                .orderId(order.getId())
-                .status(OrderStatus.READY_FOR_DELIVERY.name())
-                .build());
+        coreSupabaseOrderService.changeStatus(order.getId(), status);
+
     }
 
 
@@ -116,7 +111,6 @@ public class PosRestaurantKanbanService {
         if(kanban.getOrder().getDeliveryUserUID() != null) {
             deliverer = keycloakUserService.findById(kanban.getOrder().getDeliveryUserUID().toString());
         }
-
 
 
         return PosKanbanOrderDTO.builder()

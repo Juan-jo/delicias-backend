@@ -1,9 +1,9 @@
 package com.delivery.app.mobile.deliverer.service;
 
+import com.delicias.soft.services.core.common.OrderStatus;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
 import com.delivery.app.mobile.deliverer.dto.DeliveryOrderLastPosition;
 import com.delivery.app.mobile.deliverer.dto.MobileDeliveryOrderDetailDTO;
-import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.pos.order.models.PosOrder;
 import com.delivery.app.pos.order.repositories.PosOrderRepository;
 import com.delivery.app.security.services.AuthenticationFacade;
