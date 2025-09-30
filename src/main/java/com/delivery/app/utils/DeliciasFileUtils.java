@@ -11,7 +11,7 @@ import java.nio.file.Path;
 @Component
 public class DeliciasFileUtils {
 
-    @Value("${delicias.files.upload.path}")
+    //@Value("${delicias.files.upload.path}")
     private Path fileStorageLocation;
 
     public String saveFile(MultipartFile file) throws IOException {

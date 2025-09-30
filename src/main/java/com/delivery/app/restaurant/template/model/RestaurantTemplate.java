@@ -6,6 +6,7 @@ import com.delivery.app.restaurant.schedule.model.RestaurantTmplSchedule;
 import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -51,6 +52,9 @@ public class RestaurantTemplate extends AuditableEntity {
 
     @Column(name = "image_logo")
     private String imageLogo;
+
+    @Formula("(EXISTS (SELECT 1 FROM mobile_config mc WHERE id = ANY(mc.available_restaurants)))")
+    private boolean enabledMobile;
 
     @OneToMany(mappedBy = "restaurantTmpl")
     @OrderBy("id")

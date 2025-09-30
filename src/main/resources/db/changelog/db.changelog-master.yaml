@@ -587,6 +587,7 @@ databaseChangeLog:
             constraintName: pos_order_line_order_id_fkey
             referencedColumnNames: id
             referencedTableName: pos_order
+            onDelete: CASCADE
             validate: true
         - addForeignKeyConstraint:
             baseColumnNames: product_tmpl_id
@@ -639,6 +640,7 @@ databaseChangeLog:
             constraintName: pos_order_line_product_attribute_value_rel_order_line_id_fkey
             referencedColumnNames: id
             referencedTableName: pos_order_line
+            onDelete: CASCADE
             validate: true
         - addForeignKeyConstraint:
             baseColumnNames: product_attribute_value_id
@@ -1220,14 +1222,29 @@ databaseChangeLog:
                     type: int[]
                     remarks: List of Id`s restaurants template
                 - column:
-                    name: cost_service
+                    name: minimum_shipping_distance
                     type: FLOAT8
+                    remarks: Minimum shipping distance in kilometer
                 - column:
-                    name: zone_center_location
-                    type: GEOGRAPHY(Point)
+                    name: minimum_shipping_cost
+                    type: FLOAT8
+                    remarks: Minimum shipping cost
+                - column:
+                    name: shipping_cost_per_km
+                    type: FLOAT8
+                    remarks: Shipping cost per kilometer
+                - column:
+                    name: has_message_shipping_cost
+                    type: BOOL
+                    defaultValueBoolean: false
+                    remarks: When adding a message for the shipping cost
+                - column:
+                    name: message_shipping_cost
+                    type: VARCHAR(200)
+                    remarks: Message for the shipping cost
          - sql:
              sql: >-
-               INSERT INTO mobile_config(id, cost_service, zone_center_location) VALUES(27032024, 35, 'SRID=4326;POINT (-98.410801 21.143786)'::public.geography);
+               INSERT INTO mobile_config(id, minimum_shipping_cost, minimum_shipping_distance, shipping_cost_per_km) VALUES(27032024, 35, 1, 5);
 
   - changeSet:
       id: 27032024_36
@@ -1642,3 +1659,183 @@ databaseChangeLog:
         - sql:
             sql: >-
               CREATE INDEX idx_zones_geom ON mobile_delivery_zone USING GIST (area);
+  - changeSet:
+      id: 27032024_52
+      author: jdev
+      changes:
+        - modifyDataType:
+            tableName: restaurant_template
+            columnName: image_logo
+            newDataType: varchar(200)
+        - modifyDataType:
+            tableName: restaurant_template
+            columnName: image_cover
+            newDataType: varchar(200)
+  - changeSet:
+      id: 27032024_53
+      author: jdev
+      changes:
+        - addColumn:
+            tableName: pos_order
+            columns:
+              - column:
+                  name: adjustments
+                  type: JSONB
+                  remarks: "Lista de cargos y descuentos relacionados a la orden"
+                  defaultValue: '[]'
+  - changeSet:
+      id: 27032024_54
+      author: jdev
+      changes:
+        -  dropColumn:
+             columns:
+               -  column:
+                    name: amount_discount
+               - column:
+                   name: cost_service
+               - column:
+                   name: keycloak_user_id
+             schemaName: public
+             tableName: pos_order
+
+  - changeSet:
+      id: 27032024_55
+      author: jdev
+      changes:
+        - createIndex:
+            indexName: idx_pos_order_ready_for_assignment
+            tableName: pos_order
+            columns:
+              - column:
+                  name: date_order
+              - column:
+                  name: status
+            where: "status = 'READY_FOR_DELIVERY' AND delivery_uid IS NULL"
+        -  createView:
+            encoding:  UTF-8
+            replaceIfExists:  true
+            schemaName:  public
+            selectQuery:  select po.id, po.status , ua."position" as "user_address", po.date_order, rt."position" as "restaurant_address"
+              from pos_order po
+              join user_addresses ua ON po.user_address_id = ua.id
+              join restaurant_template rt on po.restaurant_id = rt.id
+              WHERE po.status = 'READY_FOR_DELIVERY'
+              AND po.date_order >= NOW() - INTERVAL '1 day';
+            viewName: ready_orders_for_delivery
+  - changeSet:
+      id: 27032024_56
+      author: jdev
+      changes:
+        - sql:
+            endDelimiter: \nGO
+            splitStatements: true
+            sql: >-
+              CREATE OR REPLACE FUNCTION public.assign_order_when_available(id_param integer, deliverer_id_param uuid, order_id_param integer)
+               RETURNS void
+               LANGUAGE plpgsql
+              AS $function$
+              DECLARE
+                  status text;
+              begin
+
+              	SELECT d.status INTO status FROM deliverers d WHERE d.id = id_param;
+
+              	IF status = 'ASSIGNED_ORDERS'THEN
+                          RAISE EXCEPTION 'Cannot assign deliveryUID';
+                  END IF;
+
+                	UPDATE 		deliverers 
+                		SET 	status = 'ASSIGNED_ORDERS'
+                		WHERE 	id = id_param;
+
+                 INSERT INTO delivery_order_rel 
+                 (
+                		deliverer_id, 
+                		order_id,
+                		status
+                	) 
+                	values
+                	(
+                		deliverer_id_param::uuid, 
+                		order_id_param, 
+                		'NOT_STARTED'
+                	);
+
+              EXCEPTION
+                  WHEN OTHERS then
+
+                      RAISE NOTICE 'Error order assign deliverer: %', SQLERRM;
+
+                      RAISE;
+
+              END;
+              $function$
+              ;
+  - changeSet:
+      id: 27032024_57
+      author: jdev
+      changes:
+        - sql:
+            endDelimiter: \nGO
+            splitStatements: true
+            sql: >-
+              CREATE OR REPLACE FUNCTION public.assign_order_when_delivery_assigned_orders(deliverer_id_param uuid, order_id_param integer)
+               RETURNS void
+               LANGUAGE plpgsql
+              AS $function$
+              DECLARE
+                  countNotStarted 	numeric;
+                  countRoadToDelivery numeric;
+
+              begin
+
+              	select 		count(*) into countNotStarted 
+              		from 	delivery_order_rel dor  
+              		where 	deliverer_id = deliverer_id_param::uuid
+              				and 
+              				status = 'NOT_STARTED';
+
+              	if countNotStarted > 0 then 
+              		raise exception 'Has orders, but not started';	
+              	end if;
+
+
+
+              	select 		count(*) into countRoadToDelivery 
+              		from 	delivery_order_rel dor  
+              		where 	deliverer_id = deliverer_id_param::uuid
+              				and 
+              				status = 'ROAD_TO_DELIVERY';	
+
+              	if countRoadToDelivery = 1 then
+
+              		INSERT INTO delivery_order_rel 
+              		(
+              	  		deliverer_id, 
+              	  		order_id,
+              	  		status
+              	  	) 
+              	  	values
+              	  	(
+              	  		deliverer_id_param::uuid, 
+              	  		order_id_param, 
+              	  		'NOT_STARTED'
+              	  	);
+
+              		RAISE NOTICE 'has % order to delivery', countRoadToDelivery;
+
+              	else
+
+              		raise exception 'Is not ROAD_TO_DELIVERY';
+              	end if;
+
+              exception
+                  when others then
+
+                      RAISE NOTICE 'Error assign deliverer: %', SQLERRM;
+
+                      RAISE;
+
+              END;
+              $function$
+              ;

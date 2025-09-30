@@ -12,6 +12,7 @@ import com.delivery.app.restaurant.schedule.model.RestaurantTmplSchedule;
 import com.delivery.app.restaurant.schedule.repository.RestaurantTmplScheduleRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
+import com.delivery.app.supabase.restaurant.service.SupRestaurantService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class RestaurantTmplConfigService {
     private final ProductTemplateRepository productTemplateRepository;
     private final RestaurantTmplMenuRepository restaurantTmplMenuRepository;
     private final DeliciasAppProperties deliciasAppProperties;
+    private final SupRestaurantService supRestaurantService;
 
     public RestaurantTmplConfigDTO loadConfig(Integer restaurantId) {
 
@@ -52,12 +54,8 @@ public class RestaurantTmplConfigService {
         RestaurantTmplConfigDTO.RestaurantTmplConfigDTOBuilder configDTOBuilder = RestaurantTmplConfigDTO.builder()
                 .restaurantId(restaurantTmpl.getId())
                 .restaurantName(restaurantTmpl.getName())
-                .imageCover(Optional.ofNullable(restaurantTmpl.getImageCover())
-                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                        .orElse(null))
-                .imageLogo(Optional.ofNullable(restaurantTmpl.getImageLogo())
-                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                        .orElse(null))
+                .imageCover(restaurantTmpl.getImageCover())
+                .imageLogo(restaurantTmpl.getImageLogo())
                 .address(restaurantTmpl.getAddress())
                 .latitude(lat.get())
                 .longitude(lng.get())
@@ -96,8 +94,7 @@ public class RestaurantTmplConfigService {
                         .name(r.getName())
                         .picture(
                                 Optional.ofNullable(r.getPicture())
-                                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                                        .orElse(deliciasAppProperties.getSupabase().getLogo())
                         )
                         .build())
                 .collect(Collectors.groupingBy(RestaurantTmplConfigDTO.ProductTmpl::categ));
@@ -141,6 +138,14 @@ public class RestaurantTmplConfigService {
                                 .build()).toList()
         );
 
+        restaurantTemplateRepository.save(restaurantTmpl);
+
+        // Update Supabase
+        supRestaurantService.updateRestaurant(
+                tmplConfigDTO.restaurantId(),
+                restaurantTmpl,
+                deliciasAppProperties.getSupabase().getLogo()
+        );
     }
 
     @Transactional

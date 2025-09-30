@@ -6,14 +6,17 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
+import java.util.UUID;
 
 public record CreateOrderRequestDTO(
-        @NotNull(message = "Payment type is mandatory", groups = {OnCreate.class})
+
+
         PaymentType paymentType,
 
-        @Valid
-        @NotNull(message = "Product templates is mandatory", groups = {OnCreate.class})
-        Set<RequestOrderProductTemplate> productTemplates
+        Set<RequestOrderProductTemplate> productTemplates,
+
+        @NotNull(message = "ShoppingCartId type is mandatory", groups = {OnCreate.class})
+        UUID shoppingCartId
 ) {
 
         public record RequestOrderProductTemplate(

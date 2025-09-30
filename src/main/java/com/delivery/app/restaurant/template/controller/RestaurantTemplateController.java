@@ -4,10 +4,8 @@ package com.delivery.app.restaurant.template.controller;
 import com.delivery.app.configs.validation.common.OnCreate;
 import com.delivery.app.configs.validation.common.OnFilter;
 import com.delivery.app.configs.validation.common.OnUpdate;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateReqFilterRows;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateRow;
-import com.delivery.app.restaurant.template.dto.RestaurantTmplOptionDTO;
+import com.delivery.app.delicias.general.service.MobileConfigService;
+import com.delivery.app.restaurant.template.dto.*;
 import com.delivery.app.restaurant.template.service.RestaurantTemplateService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +28,7 @@ import java.util.Map;
 public class RestaurantTemplateController {
 
     private final RestaurantTemplateService restaurantTemplateService;
+    private final MobileConfigService mobileConfigService;
 
     @PostMapping
     @Validated(OnCreate.class)
@@ -90,6 +89,17 @@ public class RestaurantTemplateController {
                 restaurantTemplateService.tmplOptionDTOList()
         );
 
+    }
+
+    @PutMapping("/mobile/enabled")
+    @Validated(OnFilter.class)
+    public ResponseEntity<Void> mobileEnabled(
+            @Valid @RequestBody RestaurantTmplEnabledMobileDTO enabledMobileDTO
+            ) {
+
+        mobileConfigService.enabledMobile(enabledMobileDTO);
+
+        return ResponseEntity.noContent().build();
     }
 
 

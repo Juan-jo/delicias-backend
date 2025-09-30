@@ -74,14 +74,23 @@ elasticsearch:
   apiKey: 'd1h5ZjI1QUJUX1pPSXB6M2RWdlY6UFRpaWpPN21RcVdWTmh5RmZKc1pnQQ=='
 
 delicias:
-  production: true
-  timezone: -6 #America/Mexico_City
-  files:
-    server: 'http://192.168.101.100:9095'
-    resources: ${delicias.files.server}/resources
-    staticDefault: ${delicias.files.server}/static/dl.png
-    upload:
-      path: '/home/jdev/delicias_cloud'
+  mobileConfigId: 27032024
+  production: false
+  timezone: -6
+#  files:
+#    server: 'http://192.168.101.100'
+#    resources: ${delicias.files.server}/resources
+#    staticDefault: ${delicias.files.server}/resources/delicias-logo.png
+#    staticDefault: ${delicias.files.server}/static/dl.png
+#    upload:
+#      path: '/delicias_cloud'
+  supabase:
+    domain: 'http://192.168.101.100:8000'
+    url: 'http://localhost:8000'
+    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE'
+    bucket: 'delicias'
+    logo: ${delicias.supabase.domain}/storage/v1/object/public/delicias/dl.png
+
 
 google:
   maps:

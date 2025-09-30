@@ -24,15 +24,7 @@ public class PosOrderController {
 
     private final PosOrderService posOrderService;
 
-    @PostMapping
-    @Validated(OnCreate.class)
-    public ResponseEntity<Void> create(
-            @Valid @RequestBody CreateOrderRequestDTO posOrderDTO) {
 
-        posOrderService.create(posOrderDTO);
-
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDTO> findById(

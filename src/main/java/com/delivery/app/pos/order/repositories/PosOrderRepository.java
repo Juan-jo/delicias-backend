@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PosOrderRepository extends JpaRepository<PosOrder, Integer> {
+public interface PosOrderRepository extends JpaRepository<PosOrder, Integer>, PosOrderRepositoryCustom {
 
     String querySearchFilter = """
                 SELECT      o

@@ -2,12 +2,12 @@ package com.delivery.app.mobile.app.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.mobile.app.dto.MobileConfigDTO;
+import com.delivery.app.delicias.general.service.MobileConfigService;
+import com.delivery.app.delicias.general.dto.MobileConfigDTO;
 import com.delivery.app.mobile.app.dto.MobileRestaurantDetailDTO;
 import com.delivery.app.mobile.app.dto.MobileRestaurantItemDTO;
-import com.delivery.app.mobile.app.repository.MobileConfigRepository;
-import com.delivery.app.mobile.user.models.ShoppingCart;
-import com.delivery.app.mobile.user.repository.ShoppingCartRepository;
+import com.delivery.app.mobile.shopping.model.ShoppingCart;
+import com.delivery.app.mobile.shopping.repository.ShoppingCartRepository;
 import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.restaurant.menu.model.RestaurantTmplMenu;
 import com.delivery.app.restaurant.schedule.model.RestaurantTmplSchedule;
@@ -62,12 +62,10 @@ public class MobileRestaurantService {
                         .shoppingCartId(Optional.ofNullable(shoppingCart).map(ShoppingCart::getId).orElse(null))
                         .shoppingCartLinesSize(Optional.ofNullable(shoppingCart).map(i->i.getLines().size()).orElse(0))
                         .imageCover(Optional.ofNullable(restaurantTmpl.getImageCover())
-                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
+                                .orElse(deliciasAppProperties.getSupabase().getLogo()))
                         .info(MobileRestaurantDetailDTO.RestaurantInfo.builder()
                                 .imageLogo(Optional.ofNullable(restaurantTmpl.getImageLogo())
-                                        .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
-                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
+                                        .orElse(deliciasAppProperties.getSupabase().getLogo()))
                                 .hourStart(todaySchedule.getStartTime())
                                 .hourEnd(todaySchedule.getEndTime())
                                 .available(realTime.isAfter(todaySchedule.getStartTime()) && realTime.isBefore(todaySchedule.getEndTime()))
@@ -106,11 +104,9 @@ public class MobileRestaurantService {
                         i.getName(),
                         i.getDescription(),
                         Optional.ofNullable(i.getImageLogo())
-                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault()),
+                                .orElse(deliciasAppProperties.getSupabase().getLogo()),
                         Optional.ofNullable(i.getImageCover())
-                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                                .orElse(deliciasAppProperties.getSupabase().getLogo())
                 ))
                 .toList();
     }
@@ -131,8 +127,7 @@ public class MobileRestaurantService {
                         r.getId(),
                         r.getName(),
                         Optional.ofNullable(r.getPicture())
-                                .map(p-> String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), p))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault()),
+                                .orElse(deliciasAppProperties.getSupabase().getLogo()),
                         r.getListPrice(),
                         r.getCategory().getName(),
                         r.getDescription()

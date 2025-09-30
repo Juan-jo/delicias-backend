@@ -10,7 +10,7 @@ import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.product.template.repositories.ViewProductTmplAttrValueRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.security.services.AuthenticationFacade;
-import com.delivery.app.utils.DeliciasFileUtils;
+import com.delivery.app.supabase.storage.SupabaseStorageService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -32,7 +32,8 @@ public class ProductTemplateService {
     private final AuthenticationFacade authenticationFacade;
     private final ViewProductTmplAttrValueRepository viewProductTmplAttrValueRepository;
 
-    private final DeliciasFileUtils deliciasFileUtils;
+    private final SupabaseStorageService supabaseStorageService;
+
     private final DeliciasAppProperties deliciasAppProperties;
 
     public ProductTemplateDTO findById(Integer tmplId) {
@@ -89,11 +90,11 @@ public class ProductTemplateService {
                 .orElseThrow(() -> new ResourceNotFoundException("productTmpl", "id", productTmplId));
 
 
-        String fileName = deliciasFileUtils.saveFile(file);
+        String fileName = supabaseStorageService.uploadImage(file);
 
         productTemplate.setPicture(fileName);
 
-        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
+        return Map.of("picture", fileName);
     }
 
     public List<ProductTmplAttributeRowDTO> attributeValuesRowDTOS(Integer productTmplId) {
@@ -126,8 +127,7 @@ public class ProductTemplateService {
                 .updatedAt(r.getUpdatedAt())
                 .picture(
                         Optional.ofNullable(r.getPicture())
-                                .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                                .orElse(deliciasAppProperties.getSupabase().getLogo())
                 )
                 .build());
     }

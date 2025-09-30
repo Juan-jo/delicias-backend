@@ -48,9 +48,7 @@ public class UserRestaurantController {
             data.put("storeName", res.name());
 
             data.put("picture", (
-                    Optional.ofNullable(res.logoPicture())
-                            .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                            .orElse(null)
+                    res.logoPicture()
             ));
 
         }));

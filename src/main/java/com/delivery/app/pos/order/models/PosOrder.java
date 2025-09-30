@@ -3,13 +3,18 @@ package com.delivery.app.pos.order.models;
 import com.delivery.app.configs.auditable.model.AuditableEntity;
 import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
+import com.delivery.app.security.model.UserAddress;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import com.vladmihalcea.hibernate.type.json.JsonType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "pos_order")
@@ -41,13 +46,8 @@ public class PosOrder extends AuditableEntity {
     @Column(name = "amount_subtotal")
     private Double amountSubtotal;
 
-    @Column(name = "amount_discount")
-    private Double amountDiscount;
 
-    @Column(name = "cost_service")
-    private Double costService;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
     private RestaurantTemplate restaurantTmpl;
 
@@ -61,11 +61,9 @@ public class PosOrder extends AuditableEntity {
     private LocalDate dateOrder;
 
     @OrderBy("id asc")
-    @OneToMany(mappedBy = "order")
-    private Set<PosOrderLine> lines;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PosOrderLine> lines = new HashSet<>();;
 
-    @Column(name = "keycloak_user_id")
-    private UUID userId;
 
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
@@ -73,4 +71,21 @@ public class PosOrder extends AuditableEntity {
 
     @Column(name = "delivery_order_rel_id")
     private Integer deliveryOrderRelId;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<PosOrderAdjustment> adjustments = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_address_id", referencedColumnName = "id")
+    private UserAddress userAddress;
+
+    public void addLine(PosOrderLine line) {
+        if(lines == null) {
+            lines = new HashSet<>();
+        }
+        lines.add(line);
+        line.setOrder(this);
+    }
+
 }

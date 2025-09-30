@@ -29,11 +29,11 @@ public class PosOrderLine extends AuditableEntity {
     private Integer id;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private PosOrder order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_tmpl_id", referencedColumnName = "id")
     private ProductTemplate productTemplate;
 
@@ -46,18 +46,17 @@ public class PosOrderLine extends AuditableEntity {
     @Column(name = "price_total")
     private Double priceTotal;
 
-    /*@ManyToMany
-    @JoinTable(
-            name = "pos_order_line_product_attribute_value_rel",
-            joinColumns = @JoinColumn(name = "id"),
-            foreignKey = @ForeignKey(name = "pos_order_line_product_attribute_value_rel_order_line_id_fkey"),
-            inverseJoinColumns = @JoinColumn(name = "product_attribute_value_id"),
-            inverseForeignKey = @ForeignKey(name = "pos_order_line_product_attribute_value_rel_product_attribute_value_id_fkey")
-    )
-    private Set<ProductAttributeValue> attributeValues = new HashSet<>();*/
-
-
-    @OneToMany(mappedBy = "line")
+    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PosOrderLineProductAttributeValueRel> attributeValues = new HashSet<>();
 
+    // Helper
+    public void addAttributeValue(PosOrderLineProductAttributeValueRel attr) {
+
+        if(attributeValues == null) {
+            attributeValues = new HashSet<>();
+        }
+
+        attributeValues.add(attr);
+        attr.setLine(this);
+    }
 }

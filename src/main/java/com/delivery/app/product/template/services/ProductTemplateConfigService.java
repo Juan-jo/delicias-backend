@@ -1,6 +1,5 @@
 package com.delivery.app.product.template.services;
 
-import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.constants.RoleType;
 import com.delivery.app.configs.exception.common.InvalidAccessResourceException;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
@@ -20,8 +19,6 @@ public class ProductTemplateConfigService {
 
     private final ProductTemplateRepository productTemplateRepository;
     private final AuthenticationFacade authenticationFacade;
-
-    private final DeliciasAppProperties deliciasAppProperties;
 
 
     public ProductTemplateConfigDTO findConfigByProductTmplId(
@@ -64,10 +61,7 @@ public class ProductTemplateConfigService {
                 .categId(template.getCategory().getId())
                 .salesOk(Optional.ofNullable(template.getSalesOK()).orElse(false))
                 .active(Optional.ofNullable(template.getActive()).orElse(false))
-                .picture(Optional.ofNullable(template.getPicture())
-                        .map(p -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), p))
-                        .orElse(null)
-                )
+                .picture(template.getPicture())
                 .build();
     }
 

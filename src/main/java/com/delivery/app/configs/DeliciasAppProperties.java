@@ -13,9 +13,11 @@ import java.time.ZoneOffset;
 @Setter
 public class DeliciasAppProperties {
 
+    private Integer mobileConfigId;
     private Boolean production;
     private Integer timezone;
-    private CloudFiles files;
+    private Supabase Supabase;
+    //private CloudFiles files;
 
     public ZoneOffset getZoneOffset() {
         return ZoneOffset.ofHours(timezone);
@@ -36,4 +38,12 @@ public class DeliciasAppProperties {
         }
     }
 
+
+    @Getter
+    @Setter
+    public static class Supabase {
+        private String logo;
+        private String bucket;
+
+    }
 }

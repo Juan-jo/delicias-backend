@@ -2,13 +2,11 @@ package com.delivery.app.restaurant.template.service;
 
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateDTO;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateReqFilterRows;
-import com.delivery.app.restaurant.template.dto.RestaurantTemplateRow;
-import com.delivery.app.restaurant.template.dto.RestaurantTmplOptionDTO;
+import com.delivery.app.restaurant.template.dto.*;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
-import com.delivery.app.utils.DeliciasFileUtils;
+import com.delivery.app.supabase.restaurant.service.SupRestaurantService;
+import com.delivery.app.supabase.storage.SupabaseStorageService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -27,9 +25,10 @@ public class RestaurantTemplateService {
 
     private final RestaurantTemplateRepository restaurantTemplateRepository;
 
-
-    private final DeliciasFileUtils deliciasFileUtils;
     private final DeliciasAppProperties deliciasAppProperties;
+
+    private final SupRestaurantService supRestaurantService;
+    private final SupabaseStorageService supabaseStorageService;
 
     @Transactional
     public RestaurantTemplateDTO create(RestaurantTemplateDTO templateDTO) {
@@ -42,6 +41,8 @@ public class RestaurantTemplateService {
 
         restaurantTemplateRepository.save(restaurantTemplate);
 
+        supRestaurantService.saveRestaurant(restaurantTemplate, deliciasAppProperties.getSupabase().getLogo());
+
         return modelToRestaurantTemplateDTO(restaurantTemplate);
     }
 
@@ -52,6 +53,10 @@ public class RestaurantTemplateService {
                 .orElseThrow(() -> new ResourceNotFoundException("restaurantTpml", "id", templateDTO.id()));
 
         restaurantTemplate.update(templateDTO);
+
+        supRestaurantService.updateRestaurant(
+                templateDTO.id(), restaurantTemplate, deliciasAppProperties.getSupabase().getLogo()
+        );
 
         return modelToRestaurantTemplateDTO(restaurantTemplate);
     }
@@ -76,12 +81,12 @@ public class RestaurantTemplateService {
         ).map(r -> RestaurantTemplateRow.builder()
                 .id(r.getId())
                 .name(r.getName())
+                .enabledMobile(r.isEnabledMobile())
                 .updatedAt(r.getUpdatedAt())
                 .createdAt(r.getCreatedAt())
                 .picture(
                         Optional.ofNullable(r.getImageLogo())
-                                .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                                .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                                .orElse(deliciasAppProperties.getSupabase().getLogo())
                 )
                 .build());
 
@@ -105,8 +110,7 @@ public class RestaurantTemplateService {
                         .name(r.getName())
                         .picture(
                                 Optional.ofNullable(r.getImageLogo())
-                                        .map(c->String.format("%s/%s", deliciasAppProperties.getFiles().getResources(), c))
-                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault())
+                                        .orElse(deliciasAppProperties.getSupabase().getLogo())
                         )
                         .build())
                 .toList();
@@ -118,24 +122,28 @@ public class RestaurantTemplateService {
         RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(restaurantTmplId)
                 .orElseThrow(() -> new ResourceNotFoundException("restaurantTpml", "id", restaurantTmplId));
 
-        String fileName = deliciasFileUtils.saveFile(cover);
+        String fileName = supabaseStorageService.uploadImage(cover);
 
         restaurantTemplate.setImageCover(fileName);
 
-        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
+        return Map.of("picture", fileName);
     }
 
     @Transactional
-    public Map<String, String> uploadLogo(Integer restaurantTmplId, MultipartFile logo) throws IOException {
+    public Map<String, String> uploadLogo(Integer restaurantTmplId, MultipartFile logoFile) throws IOException {
 
         RestaurantTemplate restaurantTemplate = restaurantTemplateRepository.findById(restaurantTmplId)
                 .orElseThrow(() -> new ResourceNotFoundException("restaurantTpml", "id", restaurantTmplId));
 
-        String fileName = deliciasFileUtils.saveFile(logo);
+        String fileName = supabaseStorageService.uploadImage(logoFile);
 
         restaurantTemplate.setImageLogo(fileName);
 
-        return Map.of("picture", String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), fileName));
+        supRestaurantService.updateRestaurant(
+                restaurantTmplId, restaurantTemplate, deliciasAppProperties.getSupabase().getLogo()
+        );
+
+        return Map.of("picture", fileName);
     }
 
     private RestaurantTemplateDTO modelToRestaurantTemplateDTO(RestaurantTemplate template) {
@@ -145,7 +153,10 @@ public class RestaurantTemplateService {
                 .name(template.getName())
                 .description(template.getDescription())
                 .phone(template.getPhone())
-                .logoPicture(template.getImageLogo())
+                .logoPicture(
+                        Optional.ofNullable(template.getImageLogo())
+                                .orElse(deliciasAppProperties.getSupabase().getLogo())
+                )
                 .build();
 
     }

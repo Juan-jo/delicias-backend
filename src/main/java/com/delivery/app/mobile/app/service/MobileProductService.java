@@ -33,8 +33,7 @@ public class MobileProductService {
                                 i.getDescription(),
                                 i.getListPrice(),
                                 Optional.ofNullable(i.getPicture())
-                                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), d))
-                                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
+                                        .orElse(deliciasAppProperties.getSupabase().getLogo()))
                         )
                 .toList();
     }
@@ -61,8 +60,7 @@ public class MobileProductService {
                 .description(productTemplate.getDescription())
                 .priceList(productTemplate.getListPrice())
                 .picture(Optional.ofNullable(productTemplate.getPicture())
-                        .map(d -> String.format("%s/%s",deliciasAppProperties.getFiles().getResources(), d))
-                        .orElse(deliciasAppProperties.getFiles().getStaticDefault()))
+                        .orElse(deliciasAppProperties.getSupabase().getLogo()))
                 .rate(random.nextInt(5 - 1 + 1) + 1)
                 .qty(1)
                 .restaurant(MobileProductTmplDetailDTO.Restaurant.builder()

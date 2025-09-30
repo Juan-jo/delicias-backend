@@ -30,13 +30,23 @@ public class MobileUserController {
 
     @GetMapping("/search-nearby")
     public ResponseEntity<Set<MobileUserNearbyGeocodingDTO>> searchNearby(
-            @RequestHeader("LatLng") String destination
+            @RequestHeader(value = "LatLng", defaultValue = "21.117347|-98.425383") String destination
     ) throws IOException, InterruptedException, ApiException {
+
+        /*
+        String[] latLng = new String[] {"21.117347", "-98.425383"};
+
+        if(destination != null && !destination.isEmpty()) {
+
+        }*/
 
         String[] latLng = destination.split(Pattern.quote("|"));
 
+
+
         double latitude = Double.parseDouble(latLng[0]);
         double longitude = Double.parseDouble(latLng[1]);
+
 
         return ResponseEntity.ok(
                 mobileUserService.searchNearby(latitude, longitude)

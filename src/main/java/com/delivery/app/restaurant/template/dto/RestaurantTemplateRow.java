@@ -13,5 +13,6 @@ public record RestaurantTemplateRow(
         LocalDateTime createdAt,
         @JsonFormat(pattern="dd/MM/yyyy HH:mm:ss")
         LocalDateTime updatedAt,
-        String picture
+        String picture,
+        boolean enabledMobile
 ) { }
