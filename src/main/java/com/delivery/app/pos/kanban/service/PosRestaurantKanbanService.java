@@ -1,10 +1,7 @@
 package com.delivery.app.pos.kanban.service;
 
-import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
-import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
 import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.pos.enums.OrderStatus;
 import com.delivery.app.pos.kanban.dtos.PosKanbanOrderDTO;
 import com.delivery.app.pos.kanban.dtos.PosRestaurantKanbanDTO;
@@ -13,14 +10,12 @@ import com.delivery.app.pos.kanban.model.PosRestaurantKanban;
 import com.delivery.app.pos.kanban.repository.PosRestaurantKanbanRepository;
 import com.delivery.app.pos.order.models.PosOrder;
 import com.delivery.app.pos.order.repositories.PosOrderRepository;
-import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import com.delivery.app.security.dtos.UserDTO;
 import com.delivery.app.security.services.KeycloakUserService;
 import com.delivery.app.supabase.order.dtos.SupOrderChangeStatusReqDTO;
 import com.delivery.app.supabase.order.service.SupOrderService;
 import lombok.AllArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +27,6 @@ import java.util.stream.Collectors;
 public class PosRestaurantKanbanService {
 
     private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
-    private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
     private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final PosOrderRepository posOrderRepository;
     private final KeycloakUserService keycloakUserService;
@@ -165,41 +159,4 @@ public class PosRestaurantKanbanService {
 
 
 
-    private void sendMessageKafkaTopicOrder(Integer orderId, String status) {
-
-        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order(
-                orderId,
-                status
-        );
-
-        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
-        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
-        kafkaTopicOrderDTO.setOrder(order);
-
-        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
-    }
-
-    @Async
-    void sendMessageTopicOrderForSearchDelivery(
-            Integer orderId,
-            RestaurantTemplate restaurantTmpl
-    ) {
-
-        KafkaTopicOrderDTO.OrderRestaurant restaurant = new KafkaTopicOrderDTO.OrderRestaurant(
-                new KafkaTopicOrderDTO.GpsPoint(
-                        restaurantTmpl.getPosition().getCoordinate().getY(),
-                        restaurantTmpl.getPosition().getCoordinate().getX())
-        );
-
-        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order(
-                orderId,
-                restaurant
-        );
-
-        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
-        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.SEARCH_DELIVERY);
-        kafkaTopicOrderDTO.setOrder(order);
-
-        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
-    }
 }

@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.delivery</groupId>
-	<artifactId>delicias</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+
+    <parent>
+        <groupId>com.delicias.soft</groupId>
+        <artifactId>delicias-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.delicias.soft.services</groupId>
+	<artifactId>delicias-backend</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<!--<packaging>war</packaging>-->
 	<packaging>jar</packaging>
 	<name>app</name>
 	<description>Backoffice Delicias App</description>
 	<properties>
-		<java.version>17</java.version>
 		<keycloak.version>25.0.6</keycloak.version>
 		<zalando.problem.version>0.27.0</zalando.problem.version>
 	</properties>
@@ -137,16 +137,7 @@
 		</dependency>
 		<!-- End Bean elasticsearch -->
 
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>com.delicias.kafka.core</groupId>
-			<artifactId>delicias-kafka-core</artifactId>
-			<version>1.0.26</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>

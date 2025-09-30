@@ -1,9 +1,6 @@
 package com.delivery.app.mobile.deliverer.service;
 
-import com.delicias.kafka.core.dto.KafkaTopicOrderDTO;
-import com.delicias.kafka.core.enums.TOPIC_ORDER_ACTION;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.mobile.deliverer.dto.DeliveryOrderLastPosition;
 import com.delivery.app.mobile.deliverer.dto.MobileDeliveryOrderDetailDTO;
 import com.delivery.app.pos.enums.OrderStatus;
@@ -25,7 +22,6 @@ public class MobileDeliveryService {
     private final PosOrderRepository posOrderRepository;
     private final JdbcTemplate jdbcTemplate;
     private final AuthenticationFacade authenticationFacade;
-    private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
 
     public MobileDeliveryOrderDetailDTO detail(Integer orderId) {
 
@@ -54,7 +50,6 @@ public class MobileDeliveryService {
         order.setStatus(OrderStatus.DELIVERY_ROAD_TO_STORE);
         posOrderRepository.save(order);
 
-        orderRoadToStore(orderId);
     }
 
     @Async
@@ -92,20 +87,7 @@ public class MobileDeliveryService {
     }
 
 
-    @Async
-    private void orderRoadToStore(Integer orderId) {
 
-        KafkaTopicOrderDTO.Order order = new KafkaTopicOrderDTO.Order(
-                orderId,
-                OrderStatus.DELIVERY_ROAD_TO_STORE.name()
-        );
-
-        KafkaTopicOrderDTO kafkaTopicOrderDTO = new KafkaTopicOrderDTO();
-        kafkaTopicOrderDTO.setAction(TOPIC_ORDER_ACTION.UPDATE_STATUS_ORDER);
-        kafkaTopicOrderDTO.setOrder(order);
-
-        kafkaTopicOrderProducer.sendMessageTopicOrder(kafkaTopicOrderDTO);
-    }
 
 
 }

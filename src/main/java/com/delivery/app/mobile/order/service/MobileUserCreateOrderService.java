@@ -1,14 +1,10 @@
 package com.delivery.app.mobile.order.service;
 
-import com.delivery.app.configs.DeliciasAppProperties;
 import com.delivery.app.configs.exception.common.ResourceNotFoundException;
-import com.delivery.app.kafka.producer.KafkaTopicKanbanProducer;
-import com.delivery.app.kafka.producer.KafkaTopicOrderProducer;
 import com.delivery.app.mobile.shopping.dto.MobileShoppingCartDTO;
 import com.delivery.app.mobile.shopping.service.MobileShoppingCartService;
 import com.delivery.app.mobile.user.dtos.MobileUserCreateOrderDTO;
 import com.delivery.app.pos.enums.OrderStatus;
-import com.delivery.app.pos.kanban.repository.PosRestaurantKanbanRepository;
 import com.delivery.app.pos.order.models.PosOrder;
 import com.delivery.app.pos.order.models.PosOrderAdjustment;
 import com.delivery.app.pos.order.models.PosOrderLine;
@@ -22,8 +18,6 @@ import com.delivery.app.product.template.repositories.ProductTemplateRepository;
 import com.delivery.app.restaurant.template.model.RestaurantTemplate;
 import com.delivery.app.restaurant.template.repository.RestaurantTemplateRepository;
 import com.delivery.app.security.model.UserAddress;
-import com.delivery.app.security.services.AuthenticationFacade;
-import com.delivery.app.security.services.KeycloakUserService;
 import com.delivery.app.supabase.order.service.SupOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -41,17 +35,12 @@ import java.util.stream.Collectors;
 public class MobileUserCreateOrderService {
 
     private final ProductTemplateRepository productTemplateRepository;
-    private final AuthenticationFacade authenticationFacade;
     private final PosOrderRepository posOrderRepository;
     private final PosOrderLineRepository posOrderLineRepository;
     private final PosOrderLineProductAttributeValueRelRepository posOrderLineProductAttributeValueRelRepository;
-    private final PosRestaurantKanbanRepository posRestaurantKanbanRepository;
-    private final KafkaTopicKanbanProducer kafkaTopicKanbanProducer;
-    private final KafkaTopicOrderProducer kafkaTopicOrderProducer;
-    private final DeliciasAppProperties deliciasAppProperties;
+
     private final RestaurantTemplateRepository restaurantTemplateRepository;
     private final MobileShoppingCartService mobileShoppingCartService;
-    private final KeycloakUserService keycloakUserService;
     private final SupOrderService supOrderService;
 
 
