@@ -3,10 +3,17 @@ server:
   servlet:
     context-path: /
 
+#logging:
+#  level:
+#    org.springframework.security: TRACE
+#    org.springframework.security.web: TRACE
+#    org.springframework.security.authentication: TRACE
+#    org.springframework.security.oauth2: TRACE
+
 
 spring:
   main:
-    banner-mode: off
+    #banner-mode: off
     allow-bean-definition-overriding: true
 
   servlet:
