@@ -1839,3 +1839,40 @@ databaseChangeLog:
               END;
               $function$
               ;
+  - changeSet:
+      id: 27032024_58
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              CREATE TYPE pos_order_status AS ENUM ('ORDERED', 'ACCEPTED', 'COOKING', 'READY_FOR_DELIVERY', 'DELIVERY_ASSIGNED_ORDER', 'DELIVERY_ROAD_TO_STORE', 'DELIVERY_ROAD_TO_DESTINATION', 'DELIVERED', 'CANCELLED', 'REJECTED', 'READY_FOR_PICKUP');
+  - changeSet:
+      id: 27032024_59
+      author: jdev
+      changes:
+        - dropView:
+            viewName: ready_orders_for_delivery
+  - changeSet:
+      id: 27032024_60
+      author: jdev
+      changes:
+        - sql:
+            sql: >-
+              ALTER TABLE pos_order ALTER COLUMN status TYPE pos_order_status USING status::pos_order_status;
+  - changeSet:
+      id: 27032024_61
+      author: jdev
+      changes:
+        -  createView:
+             encoding:  UTF-8
+             replaceIfExists:  true
+             schemaName:  public
+             selectQuery:  select po.id, po.status , ua."position" as "user_address", po.date_order, rt."position" as "restaurant_address"
+               from pos_order po
+               join user_addresses ua ON po.user_address_id = ua.id
+               join restaurant_template rt on po.restaurant_id = rt.id
+               WHERE po.status = 'READY_FOR_DELIVERY'::pos_order_status
+               AND po.date_order >= NOW() - INTERVAL '1 day'
+               FOR UPDATE SKIP LOCKED
+               LIMIT 100;
+             viewName: ready_orders_for_delivery
