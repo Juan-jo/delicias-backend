@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.delicias.soft</groupId>
         <artifactId>delicias-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>com.delicias.soft.services</groupId>
@@ -178,7 +178,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3.1</version> <!-- O la última versión estable -->
         </dependency>
 
         <dependency>

@@ -34,6 +34,8 @@ public class PosOrder extends AuditableEntity {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", columnDefinition = "pos_order_status")
     private OrderStatus status;
 
     private String notes;
